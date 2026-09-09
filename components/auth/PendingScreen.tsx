@@ -48,8 +48,7 @@ export default function PendingScreen({ profile }: PendingScreenProps) {
         </p>
 
         <div
-          className="rounded-xl p-4 mb-6 text-right text-xs text-muted-foreground space-y-1.5"
-          style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.07)" }}
+          className="rounded-xl p-4 mb-6 text-right text-xs text-muted-foreground space-y-1.5 bg-black/5 dark:bg-white/[0.04] border border-border"
         >
           <div className="flex justify-between">
             <span className="text-foreground font-medium">{profile.fullName}</span>
@@ -66,7 +65,7 @@ export default function PendingScreen({ profile }: PendingScreenProps) {
             <span>תפקיד:</span>
           </div>
           <div className="flex justify-between">
-            <span className="font-semibold text-amber-400">
+            <span className={`font-semibold ${isRejected ? "text-red-700 dark:text-red-400" : "text-amber-700 dark:text-amber-400"}`}>
               {isRejected ? "נדחה" : "ממתין לאישור"}
             </span>
             <span>סטטוס:</span>
@@ -81,8 +80,7 @@ export default function PendingScreen({ profile }: PendingScreenProps) {
 
         <button
           onClick={() => signOut(auth)}
-          className="w-full py-2.5 rounded-lg text-sm font-medium text-muted-foreground hover:text-foreground transition-all cursor-pointer hover:bg-white/5"
-          style={{ border: "1px solid var(--card-border)" }}
+          className="w-full py-2.5 rounded-lg text-sm font-medium text-muted-foreground hover:text-foreground transition-all cursor-pointer hover:bg-black/5 dark:hover:bg-white/5 border border-border"
         >
           התנתקות מהחשבון
         </button>

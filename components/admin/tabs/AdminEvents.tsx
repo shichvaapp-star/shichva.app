@@ -71,16 +71,16 @@ function groupLabel(ts: Timestamp): string {
 function getCategoryBadgeClass(category: string): string {
   switch (category) {
     case "מבחן":
-      return "bg-red-500/20 text-red-300 border-red-500/30";
+      return "bg-red-500/15 text-red-700 dark:text-red-300 border-red-500/30";
     case "בוחן":
-      return "bg-orange-500/20 text-orange-300 border-orange-500/30";
+      return "bg-orange-500/15 text-amber-700 dark:text-orange-300 border-orange-500/30";
     case "חג":
     case "חופש":
-      return "bg-violet-500/20 text-violet-300 border-violet-500/30";
+      return "bg-violet-500/15 text-violet-700 dark:text-violet-300 border-violet-500/30";
     case "טיול":
-      return "bg-emerald-500/20 text-emerald-300 border-emerald-500/30";
+      return "bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 border-emerald-500/30";
     default:
-      return "bg-blue-500/20 text-blue-300 border-blue-500/30";
+      return "bg-blue-500/15 text-blue-700 dark:text-blue-300 border-blue-500/30";
   }
 }
 
@@ -501,7 +501,7 @@ export default function AdminEvents({ classId }: Props) {
                   new Date(Date.UTC(currentMonth.getUTCFullYear(), currentMonth.getUTCMonth() + 1, 1))
                 )
               }
-              className="w-9 h-9 flex items-center justify-center rounded-lg border border-white/[0.13] bg-white/[0.07] text-slate-300 text-xl hover:bg-white/[0.14] hover:text-slate-100 transition-all cursor-pointer"
+              className="w-9 h-9 flex items-center justify-center rounded-lg border border-border bg-black/5 dark:bg-white/[0.07] text-foreground text-xl hover:bg-black/10 dark:hover:bg-white/[0.14] transition-all cursor-pointer"
             >
               ‹
             </button>
@@ -514,20 +514,20 @@ export default function AdminEvents({ classId }: Props) {
                   new Date(Date.UTC(currentMonth.getUTCFullYear(), currentMonth.getUTCMonth() - 1, 1))
                 )
               }
-              className="w-9 h-9 flex items-center justify-center rounded-lg border border-white/[0.13] bg-white/[0.07] text-slate-300 text-xl hover:bg-white/[0.14] hover:text-slate-100 transition-all cursor-pointer"
+              className="w-9 h-9 flex items-center justify-center rounded-lg border border-border bg-black/5 dark:bg-white/[0.07] text-foreground text-xl hover:bg-black/10 dark:hover:bg-white/[0.14] transition-all cursor-pointer"
             >
               ›
             </button>
           </div>
 
           {/* Grid Container */}
-          <div className="w-full overflow-x-auto rounded-xl border border-white/10">
+          <div className="w-full overflow-x-auto rounded-xl border border-border">
             <div className="min-w-[700px] grid grid-cols-7 border-collapse">
               {/* Day Name Headers */}
               {["ראשון", "שני", "שלישי", "רביעי", "חמישי", "שישי", "שבת"].map((dayName) => (
                 <div
                   key={dayName}
-                  className="p-2 text-center text-xs font-semibold text-muted-foreground border-b border-white/10 bg-white/[0.02]"
+                  className="p-2 text-center text-xs font-semibold text-muted-foreground border-b border-border bg-black/[0.02] dark:bg-white/[0.02]"
                 >
                   {dayName}
                 </div>
@@ -560,10 +560,10 @@ export default function AdminEvents({ classId }: Props) {
                       setFormEndDate("");
                       setIsDrawerOpen(true);
                     }}
-                    className={`min-h-[105px] flex flex-col justify-between p-2 border-b border-r border-white/10 hover:bg-white/[0.04] transition-colors cursor-pointer select-none ${
+                    className={`min-h-[105px] flex flex-col justify-between p-2 border-b border-r border-border hover:bg-black/[0.03] dark:hover:bg-white/[0.04] transition-colors cursor-pointer select-none ${
                       isCurrentMonth ? "" : "opacity-30"
                     } ${
-                      idx % 7 === 0 ? "border-l border-white/10" : ""
+                      idx % 7 === 0 ? "border-l border-border" : ""
                     } ${
                       isToday ? "bg-[rgba(var(--theme-accent-rgb),0.07)]" : ""
                     }`}
@@ -579,7 +579,7 @@ export default function AdminEvents({ classId }: Props) {
                     <div className="flex justify-between items-center mb-1">
                       <span
                         className={`text-xs font-bold w-6 h-6 flex items-center justify-center rounded-full ${
-                          isToday ? "text-white" : "text-slate-300"
+                          isToday ? "text-white" : "text-foreground"
                         }`}
                         style={isToday ? { backgroundColor: "var(--theme-accent)" } : {}}
                       >
@@ -887,7 +887,7 @@ export default function AdminEvents({ classId }: Props) {
 
               {importLoading ? (
                 <div className="text-center py-8">
-                  <p className="text-slate-400">טוען ומפענח אירועים מגוגל קלנדר...</p>
+                  <p className="text-muted-foreground">טוען ומפענח אירועים מגוגל קלנדר...</p>
                 </div>
               ) : (
                 <div className="admin-table-wrapper">
@@ -929,7 +929,7 @@ export default function AdminEvents({ classId }: Props) {
                         return (
                           <tr
                             key={index}
-                            className={`transition-colors ${ev.alreadyExists ? "opacity-60 bg-white/[0.01]" : ""}`}
+                            className={`transition-colors ${ev.alreadyExists ? "opacity-60 bg-black/[0.01] dark:bg-white/[0.01]" : ""}`}
                           >
                             <td>
                               <input
@@ -963,10 +963,10 @@ export default function AdminEvents({ classId }: Props) {
                                   updated[index].category = e.target.value;
                                   setImportEvents(updated);
                                 }}
-                                className="bg-white/[0.06] border border-white/10 rounded-lg p-1.5 text-xs text-foreground outline-none focus:border-[var(--theme-accent)] transition-colors w-full"
+                                className="bg-[var(--input-bg)] border border-[var(--input-border)] rounded-lg p-1.5 text-xs text-foreground outline-none focus:border-[var(--theme-accent)] transition-colors w-full"
                               >
                                 {CATEGORIES.map((c) => (
-                                  <option key={c} value={c} className="bg-slate-900">
+                                  <option key={c} value={c} className="bg-[var(--card-bg)] text-foreground">
                                     {c}
                                   </option>
                                 ))}
@@ -974,11 +974,11 @@ export default function AdminEvents({ classId }: Props) {
                             </td>
                             <td className="cell-nowrap">
                               {ev.alreadyExists ? (
-                                <span className="text-xs text-yellow-400 bg-yellow-400/10 px-2 py-0.5 border border-yellow-400/20 rounded-full font-medium">
+                                <span className="text-xs text-amber-700 dark:text-yellow-400 bg-amber-500/10 px-2 py-0.5 border border-amber-500/20 rounded-full font-medium">
                                   קיים כבר באתר ⚠️
                                 </span>
                               ) : (
-                                <span className="text-xs text-emerald-400 bg-emerald-400/10 px-2 py-0.5 border border-emerald-400/20 rounded-full font-medium">
+                                <span className="text-xs text-emerald-700 dark:text-emerald-400 bg-emerald-500/10 px-2 py-0.5 border border-emerald-500/20 rounded-full font-medium">
                                   חדש לייבוא ✓
                                 </span>
                               )}
@@ -1006,12 +1006,12 @@ export default function AdminEvents({ classId }: Props) {
 
       {/* Drawer Container Panel */}
       <div
-        className={`fixed top-0 bottom-0 left-0 w-full max-w-md bg-[#16122d] border-r border-white/10 shadow-2xl flex flex-col z-[100] transition-transform duration-300 ease-in-out ${
+        className={`fixed top-0 bottom-0 left-0 w-full max-w-md bg-[var(--card-bg)] border-r border-border shadow-2xl flex flex-col z-[100] transition-transform duration-300 ease-in-out ${
           isDrawerOpen ? "translate-x-0" : "-translate-x-full"
         }`}
       >
         {/* Drawer Header */}
-        <div className="p-6 border-b border-white/10 flex justify-between items-center">
+        <div className="p-6 border-b border-border flex justify-between items-center">
           <div>
             <h3 className="text-lg font-bold text-foreground leading-snug">
               {selectedDate.toLocaleDateString("he-IL", {
@@ -1025,7 +1025,7 @@ export default function AdminEvents({ classId }: Props) {
           </div>
           <button
             onClick={() => setIsDrawerOpen(false)}
-            className="text-muted-foreground hover:text-foreground text-xl p-2 cursor-pointer hover:bg-white/5 rounded-lg transition-colors"
+            className="text-muted-foreground hover:text-foreground text-xl p-2 cursor-pointer hover:bg-black/5 dark:hover:bg-white/5 rounded-lg transition-colors"
           >
             ✕
           </button>
@@ -1039,7 +1039,7 @@ export default function AdminEvents({ classId }: Props) {
               אירועים קיימים ביום זה
             </h4>
             {dayEvents.length === 0 ? (
-              <p className="text-sm text-slate-400 italic bg-white/[0.02] rounded-lg p-3 border border-dashed border-white/5">
+              <p className="text-sm text-muted-foreground italic bg-black/[0.02] dark:bg-white/[0.02] rounded-lg p-3 border border-dashed border-border">
                 אין אירועים רשומים ליום זה.
               </p>
             ) : (
@@ -1049,7 +1049,7 @@ export default function AdminEvents({ classId }: Props) {
                   return (
                     <div
                       key={event.id}
-                      className="bg-white/[0.03] border border-white/5 rounded-xl p-3 flex flex-col gap-2 relative group hover:bg-white/[0.05] transition-colors"
+                      className="bg-black/[0.02] dark:bg-white/[0.03] border border-border rounded-xl p-3 flex flex-col gap-2 relative group hover:bg-black/[0.04] dark:hover:bg-white/[0.05] transition-colors"
                     >
                       <div className="flex justify-between items-start gap-2">
                         <span className={`text-xs px-2 py-0.5 rounded-full border font-medium ${badgeClass}`}>
@@ -1068,13 +1068,13 @@ export default function AdminEvents({ classId }: Props) {
                       <div className="flex gap-2 justify-end mt-1 opacity-80 group-hover:opacity-100 transition-opacity">
                         <button
                           onClick={() => loadEventToForm(event)}
-                          className="text-xs text-blue-400 hover:text-blue-300 font-medium px-2 py-1 rounded bg-blue-500/10 hover:bg-blue-500/20 transition-colors cursor-pointer"
+                          className="text-xs text-blue-600 dark:text-blue-400 hover:text-blue-500 font-medium px-2 py-1 rounded bg-blue-500/10 hover:bg-blue-500/20 transition-colors cursor-pointer"
                         >
                           עריכה
                         </button>
                         <button
                           onClick={() => handleDeleteEvent(event)}
-                          className="text-xs text-red-400 hover:text-red-300 font-medium px-2 py-1 rounded bg-red-500/10 hover:bg-red-500/20 transition-colors cursor-pointer"
+                          className="text-xs text-red-600 dark:text-red-400 hover:text-red-500 font-medium px-2 py-1 rounded bg-red-500/10 hover:bg-red-500/20 transition-colors cursor-pointer"
                         >
                           מחיקה
                         </button>
@@ -1087,7 +1087,7 @@ export default function AdminEvents({ classId }: Props) {
           </div>
 
           {/* Unified Add/Edit Form */}
-          <div className="border-t border-white/10 pt-6">
+          <div className="border-t border-border pt-6">
             <form onSubmit={handleFormSubmit} className="flex flex-col gap-4">
               <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
                 {formId ? "עריכת פרטי אירוע" : "הוספת אירוע חדש ליום זה"}
@@ -1101,7 +1101,7 @@ export default function AdminEvents({ classId }: Props) {
                   onChange={(e) => setFormTitle(e.target.value)}
                   required
                   placeholder="למשל: יום הורים, מבחן במתמטיקה"
-                  className="w-full bg-white/[0.06] border border-white/10 rounded-lg p-2 text-sm text-foreground outline-none focus:border-[var(--theme-accent)] transition-colors"
+                  className="w-full bg-[var(--input-bg)] border border-[var(--input-border)] rounded-lg p-2 text-sm text-foreground outline-none focus:border-[var(--theme-accent)] transition-colors"
                 />
               </div>
 
@@ -1114,7 +1114,7 @@ export default function AdminEvents({ classId }: Props) {
                     onChange={(e) => setFormDate(e.target.value)}
                     required
                     dir="ltr"
-                    className="w-full bg-white/[0.06] border border-white/10 rounded-lg p-2 text-sm text-foreground outline-none focus:border-[var(--theme-accent)] transition-colors"
+                    className="w-full bg-[var(--input-bg)] border border-[var(--input-border)] rounded-lg p-2 text-sm text-foreground outline-none focus:border-[var(--theme-accent)] transition-colors"
                   />
                 </div>
                 <div className="flex flex-col gap-1">
@@ -1124,7 +1124,7 @@ export default function AdminEvents({ classId }: Props) {
                     value={formEndDate}
                     onChange={(e) => setFormEndDate(e.target.value)}
                     dir="ltr"
-                    className="w-full bg-white/[0.06] border border-white/10 rounded-lg p-2 text-sm text-foreground outline-none focus:border-[var(--theme-accent)] transition-colors"
+                    className="w-full bg-[var(--input-bg)] border border-[var(--input-border)] rounded-lg p-2 text-sm text-foreground outline-none focus:border-[var(--theme-accent)] transition-colors"
                   />
                 </div>
               </div>
@@ -1138,7 +1138,7 @@ export default function AdminEvents({ classId }: Props) {
                     onChange={(e) => setFormTime(e.target.value)}
                     placeholder="למשל: 09:00"
                     dir="ltr"
-                    className="w-full bg-white/[0.06] border border-white/10 rounded-lg p-2 text-sm text-foreground outline-none focus:border-[var(--theme-accent)] transition-colors"
+                    className="w-full bg-[var(--input-bg)] border border-[var(--input-border)] rounded-lg p-2 text-sm text-foreground outline-none focus:border-[var(--theme-accent)] transition-colors"
                   />
                 </div>
                 <div className="flex flex-col gap-1">
@@ -1146,10 +1146,10 @@ export default function AdminEvents({ classId }: Props) {
                   <select
                     value={formCat}
                     onChange={(e) => setFormCat(e.target.value)}
-                    className="w-full bg-white/[0.06] border border-white/10 rounded-lg p-2 text-sm text-foreground outline-none focus:border-[var(--theme-accent)] transition-colors"
+                    className="w-full bg-[var(--input-bg)] border border-[var(--input-border)] rounded-lg p-2 text-sm text-foreground outline-none focus:border-[var(--theme-accent)] transition-colors"
                   >
                     {CATEGORIES.map((c) => (
-                      <option key={c} value={c} className="bg-slate-900">
+                      <option key={c} value={c} className="bg-[var(--card-bg)] text-foreground">
                         {c}
                       </option>
                     ))}

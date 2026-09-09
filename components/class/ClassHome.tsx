@@ -150,7 +150,7 @@ export default function ClassHome({ classId }: Props) {
         <main className="pt-20 max-w-3xl mx-auto px-4" style={{ position: "relative", zIndex: 1 }}>
           {/* Hero Cover Banner */}
           {settings.coverUrl && (
-            <div className="relative w-full h-44 sm:h-64 rounded-3xl overflow-hidden mt-4 mb-2 border border-white/10 shadow-lg group">
+            <div className="relative w-full h-44 sm:h-64 rounded-3xl overflow-hidden mt-4 mb-2 border border-border shadow-lg group">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={settings.coverUrl}
@@ -198,7 +198,7 @@ export default function ClassHome({ classId }: Props) {
 
           {/* Announcements */}
           {settings.modules?.announcements !== false && (
-            <section id="announcements" className="py-16 border-t border-white/10">
+            <section id="announcements" className="py-16 border-t border-border">
               <h2 className="text-2xl font-bold text-foreground mb-6">הודעות המחנך</h2>
               <Announcements classId={classId} />
             </section>
@@ -208,7 +208,7 @@ export default function ClassHome({ classId }: Props) {
 
           {/* Schedule */}
           {settings.modules?.schedule !== false && (
-            <section id="schedule" className="py-16 border-t border-white/10">
+            <section id="schedule" className="py-16 border-t border-border">
               <h2 className="text-2xl font-bold text-foreground mb-6">מערכת שעות</h2>
               <Schedule
                 classId={classId}
@@ -220,7 +220,7 @@ export default function ClassHome({ classId }: Props) {
 
           {/* Events */}
           {settings.modules?.events !== false && (
-            <section id="events" className="py-16 border-t border-white/10">
+            <section id="events" className="py-16 border-t border-border">
               <h2 className="text-2xl font-bold text-foreground mb-6">אירועים ומבחנים</h2>
               <Events classId={classId} />
             </section>
@@ -228,7 +228,7 @@ export default function ClassHome({ classId }: Props) {
 
           {/* Seating */}
           {settings.modules?.seating !== false && (
-            <section id="seating" className="py-16 border-t border-white/10">
+            <section id="seating" className="py-16 border-t border-border">
               <h2 className="text-2xl font-bold text-foreground mb-6">מקומות ישיבה</h2>
               <Seating classId={classId} />
             </section>
@@ -236,7 +236,7 @@ export default function ClassHome({ classId }: Props) {
 
           {/* Teachers */}
           {settings.modules?.teachers !== false && (
-            <section id="teachers" className="py-16 border-t border-white/10">
+            <section id="teachers" className="py-16 border-t border-border">
               <h2 className="text-2xl font-bold text-foreground mb-1.5">צוות המורים</h2>
               <p className="text-xs sm:text-sm text-muted-foreground mb-6">
                 כאשר מפורסם מספר הטלפון של מורה יש להקפיד על פנייה בשעות ראויות ולא יאוחר מהשעה 20:00
@@ -252,7 +252,7 @@ export default function ClassHome({ classId }: Props) {
 
           {/* Quick Links */}
           {settings.modules?.links !== false && (
-            <section id="links" className="py-16 border-t border-white/10">
+            <section id="links" className="py-16 border-t border-border">
               <h2 className="text-2xl font-bold text-foreground mb-6">קישורים חשובים</h2>
               <QuickLinks />
             </section>

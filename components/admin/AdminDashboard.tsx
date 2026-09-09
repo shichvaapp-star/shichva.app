@@ -98,14 +98,14 @@ export default function AdminDashboard({ classId }: Props) {
           <div
             className="sticky top-0 z-50 flex items-center justify-between px-6 py-3"
             style={{
-              background: "rgba(10,8,30,0.92)",
+              background: "var(--nav-bg)",
               backdropFilter: "blur(14px)",
-              borderBottom: "1px solid rgba(255,255,255,0.07)",
+              borderBottom: "1px solid var(--nav-border)",
             }}
           >
             <div className="flex items-center gap-3">
               <span className="font-bold text-foreground">{settings.className}</span>
-              <span className="text-white/20">|</span>
+              <span className="text-muted-foreground/40">|</span>
               <span className="text-muted-foreground text-sm">פאנל ניהול</span>
             </div>
 
@@ -113,13 +113,13 @@ export default function AdminDashboard({ classId }: Props) {
               <Link
                 href={siteUrl}
                 target="_blank"
-                className="text-xs text-muted-foreground hover:text-foreground transition-colors px-3 py-1.5 rounded-full hover:bg-white/10"
+                className="text-xs text-muted-foreground hover:text-foreground transition-colors px-3 py-1.5 rounded-full hover:bg-black/5 dark:hover:bg-white/10"
               >
                 צפייה באתר ↗
               </Link>
               <button
                 onClick={() => signOut(auth)}
-                className="text-xs text-muted-foreground hover:text-foreground transition-colors px-3 py-1.5 rounded-full hover:bg-white/10"
+                className="text-xs text-muted-foreground hover:text-foreground transition-colors px-3 py-1.5 rounded-full hover:bg-black/5 dark:hover:bg-white/10 cursor-pointer"
               >
                 יציאה
               </button>
@@ -128,8 +128,7 @@ export default function AdminDashboard({ classId }: Props) {
 
           {/* Tab navigation */}
           <div
-            className="flex gap-2 px-6 py-3 overflow-x-auto"
-            style={{ borderBottom: "1px solid rgba(255,255,255,0.07)" }}
+            className="flex gap-2 px-6 py-3 overflow-x-auto border-b border-border bg-[var(--card-bg)]"
           >
             {TABS.map((tab) => (
               <button
@@ -137,8 +136,8 @@ export default function AdminDashboard({ classId }: Props) {
                 onClick={() => setActiveTab(tab.id)}
                 className={`text-sm px-4 py-2 rounded-lg whitespace-nowrap transition-all cursor-pointer flex items-center gap-1.5 ${
                   activeTab === tab.id
-                    ? "bg-violet-600/30 text-violet-300 border border-violet-500/40"
-                    : "text-muted-foreground hover:text-foreground hover:bg-white/5"
+                    ? "bg-violet-500/15 text-violet-700 dark:text-violet-300 border border-violet-500/40 font-medium"
+                    : "text-muted-foreground hover:text-foreground hover:bg-black/5 dark:hover:bg-white/5"
                 }`}
               >
                 <span>{tab.label}</span>

@@ -306,11 +306,7 @@ export default function AdminSettings({ classId }: Props) {
               onChange={(e) => setClassName(e.target.value)}
               placeholder="לדוגמה: כיתה ח׳2 או כיתה ט׳1"
               required
-              className="w-full rounded-xl px-4 py-2.5 text-sm text-foreground outline-none transition-all"
-              style={{
-                background: "rgba(255,255,255,0.06)",
-                border: "1px solid rgba(255,255,255,0.12)",
-              }}
+              className="w-full rounded-xl px-4 py-2.5 text-sm text-foreground outline-none transition-all bg-[var(--input-bg)] border border-[var(--input-border)] focus:border-[var(--theme-accent)]"
             />
             <span className="text-xs text-muted-foreground">יוצג ככותרת הראשית בדף הכיתה.</span>
           </div>
@@ -323,11 +319,7 @@ export default function AdminSettings({ classId }: Props) {
               onChange={(e) => setSchoolName(e.target.value)}
               placeholder="לדוגמה: חטיבת הביניים בן גוריון הרצליה"
               required
-              className="w-full rounded-xl px-4 py-2.5 text-sm text-foreground outline-none transition-all"
-              style={{
-                background: "rgba(255,255,255,0.06)",
-                border: "1px solid rgba(255,255,255,0.12)",
-              }}
+              className="w-full rounded-xl px-4 py-2.5 text-sm text-foreground outline-none transition-all bg-[var(--input-bg)] border border-[var(--input-border)] focus:border-[var(--theme-accent)]"
             />
             <span className="text-xs text-muted-foreground">מופיע מעל שם הכיתה בכותרת העליונה.</span>
           </div>
@@ -342,11 +334,7 @@ export default function AdminSettings({ classId }: Props) {
               value={motto}
               onChange={(e) => setMotto(e.target.value)}
               placeholder="לדוגמה: ״לומדים, גדלים ומצליחים ביחד!״"
-              className="w-full rounded-xl px-4 py-2.5 text-sm text-foreground outline-none transition-all"
-              style={{
-                background: "rgba(255,255,255,0.06)",
-                border: "1px solid rgba(255,255,255,0.12)",
-              }}
+              className="w-full rounded-xl px-4 py-2.5 text-sm text-foreground outline-none transition-all bg-[var(--input-bg)] border border-[var(--input-border)] focus:border-[var(--theme-accent)]"
             />
             <span className="text-xs text-muted-foreground">
               מוצג מתחת לשם הכיתה בראש הדף הראשי ומעניק אווירה אישית ומעצימה.
@@ -368,7 +356,7 @@ export default function AdminSettings({ classId }: Props) {
                 type="button"
                 onClick={() => setMascot("")}
                 className={`px-3 py-1.5 rounded-xl text-xs font-medium border transition-all cursor-pointer ${
-                  !mascot ? "bg-white/15 border-white/30 text-foreground font-bold" : "border-white/10 text-muted-foreground hover:bg-white/5"
+                  !mascot ? "bg-black/10 dark:bg-white/15 border-border text-foreground font-bold" : "border-border text-muted-foreground hover:bg-black/5 dark:hover:bg-white/5"
                 }`}
               >
                 ללא סמל
@@ -381,7 +369,7 @@ export default function AdminSettings({ classId }: Props) {
                   className={`w-9 h-9 rounded-xl text-lg flex items-center justify-center border transition-all cursor-pointer ${
                     mascot === emoji
                       ? "ring-2 ring-violet-500 bg-violet-500/20 border-violet-500 scale-110"
-                      : "border-white/10 hover:bg-white/10 opacity-80 hover:opacity-100"
+                      : "border-border hover:bg-black/5 dark:hover:bg-white/10 opacity-80 hover:opacity-100"
                   }`}
                 >
                   {emoji}
@@ -392,11 +380,7 @@ export default function AdminSettings({ classId }: Props) {
                 value={mascot}
                 onChange={(e) => setMascot(e.target.value.slice(0, 4))}
                 placeholder="הקלד אימוג׳י..."
-                className="w-28 rounded-xl px-3 py-1.5 text-xs text-foreground outline-none text-center"
-                style={{
-                  background: "rgba(255,255,255,0.06)",
-                  border: "1px solid rgba(255,255,255,0.12)",
-                }}
+                className="w-28 rounded-xl px-3 py-1.5 text-xs text-foreground outline-none text-center bg-[var(--input-bg)] border border-[var(--input-border)] focus:border-[var(--theme-accent)]"
               />
             </div>
             <span className="text-xs text-muted-foreground">
@@ -405,15 +389,11 @@ export default function AdminSettings({ classId }: Props) {
           </div>
 
           {/* School Logo */}
-          <div className="flex flex-col gap-2 pt-4 border-t border-white/10">
+          <div className="flex flex-col gap-2 pt-4 border-t border-border">
             <label className="text-sm font-medium text-foreground">סמל בית הספר</label>
             <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
               <div
-                className="w-20 h-20 rounded-2xl flex items-center justify-center p-2 shrink-0 border"
-                style={{
-                  background: "rgba(255,255,255,0.04)",
-                  borderColor: "rgba(255,255,255,0.12)",
-                }}
+                className="w-20 h-20 rounded-2xl flex items-center justify-center p-2 shrink-0 border border-border bg-black/5 dark:bg-white/[0.04]"
               >
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
@@ -528,7 +508,7 @@ export default function AdminSettings({ classId }: Props) {
                     type="button"
                     onClick={handleSendTestEmail}
                     disabled={testingEmail || !notificationEmail}
-                    className="px-4 py-2.5 rounded-xl text-xs font-semibold bg-white/10 hover:bg-white/15 text-foreground border border-white/10 transition-all cursor-pointer disabled:opacity-40 shrink-0"
+                    className="px-4 py-2.5 rounded-xl text-xs font-semibold bg-black/5 hover:bg-black/10 dark:bg-white/10 dark:hover:bg-white/15 text-foreground border border-border transition-all cursor-pointer disabled:opacity-40 shrink-0"
                   >
                     {testingEmail ? "שולח בדיקה..." : "✉️ שלח מייל בדיקה"}
                   </button>
@@ -542,8 +522,8 @@ export default function AdminSettings({ classId }: Props) {
                 <div
                   className={`p-3 rounded-xl text-xs flex items-center gap-2 ${
                     testEmailStatus.type === "success"
-                      ? "bg-emerald-500/10 border border-emerald-500/25 text-emerald-300"
-                      : "bg-red-500/10 border border-red-500/25 text-red-300"
+                      ? "bg-emerald-500/10 border border-emerald-500/25 text-emerald-700 dark:text-emerald-300"
+                      : "bg-red-500/10 border border-red-500/25 text-red-700 dark:text-red-300"
                   }`}
                 >
                   <span>{testEmailStatus.type === "success" ? "✓" : "⚠️"}</span>
@@ -575,7 +555,7 @@ export default function AdminSettings({ classId }: Props) {
 
           {coverUrl ? (
             <div className="space-y-3">
-              <div className="relative w-full h-44 sm:h-56 rounded-2xl overflow-hidden border border-white/15 shadow-md group">
+              <div className="relative w-full h-44 sm:h-56 rounded-2xl overflow-hidden border border-border shadow-md group">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src={coverUrl}
@@ -606,7 +586,7 @@ export default function AdminSettings({ classId }: Props) {
                 <button
                   type="button"
                   onClick={() => setCoverUrl("")}
-                  className="text-red-400 hover:text-red-300 underline cursor-pointer"
+                  className="text-red-500 hover:text-red-400 underline cursor-pointer"
                 >
                   הסר תמונה
                 </button>
@@ -615,9 +595,9 @@ export default function AdminSettings({ classId }: Props) {
           ) : (
             <div
               onClick={() => coverInputRef.current?.click()}
-              className="border-2 border-dashed border-white/15 rounded-2xl p-8 flex flex-col items-center justify-center text-center hover:border-violet-500/50 hover:bg-white/5 transition-all cursor-pointer group"
+              className="border-2 border-dashed border-border rounded-2xl p-8 flex flex-col items-center justify-center text-center hover:border-violet-500/50 hover:bg-black/5 dark:hover:bg-white/5 transition-all cursor-pointer group"
             >
-              <div className="w-12 h-12 rounded-2xl bg-white/5 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
+              <div className="w-12 h-12 rounded-2xl bg-black/5 dark:bg-white/5 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
                 <ImageIcon className="w-6 h-6 text-muted-foreground group-hover:text-violet-400 transition-colors" />
               </div>
               <span className="text-sm font-semibold text-foreground">
@@ -641,8 +621,8 @@ export default function AdminSettings({ classId }: Props) {
           />
 
           {uploadingCover && (
-            <div className="flex items-center gap-2 text-xs text-violet-400 animate-pulse">
-              <div className="w-4 h-4 rounded-full border-2 border-violet-400 border-t-transparent animate-spin" />
+            <div className="flex items-center gap-2 text-xs text-violet-500 animate-pulse">
+              <div className="w-4 h-4 rounded-full border-2 border-violet-500 border-t-transparent animate-spin" />
               <span>מעלה תמונת נושא לענן...</span>
             </div>
           )}
@@ -675,11 +655,11 @@ export default function AdminSettings({ classId }: Props) {
                     key={opt.id}
                     onClick={() => setTheme(opt.id)}
                     className={`flex flex-col items-center justify-center p-3 rounded-xl border transition-all cursor-pointer ${
-                      isSelected ? "ring-2 ring-offset-2 ring-offset-background" : "hover:bg-white/5 opacity-80 hover:opacity-100"
+                      isSelected ? "ring-2 ring-offset-2 ring-offset-background" : "border-border bg-black/[0.02] dark:bg-white/[0.03] hover:bg-black/5 dark:hover:bg-white/5 opacity-80 hover:opacity-100"
                     }`}
                     style={{
-                      backgroundColor: isSelected ? opt.bg : "rgba(255,255,255,0.03)",
-                      borderColor: isSelected ? opt.border : "rgba(255,255,255,0.1)",
+                      backgroundColor: isSelected ? opt.bg : undefined,
+                      borderColor: isSelected ? opt.border : undefined,
                       outlineColor: opt.color,
                     }}
                   >
@@ -695,7 +675,7 @@ export default function AdminSettings({ classId }: Props) {
           </div>
 
           {/* Background Art Style */}
-          <div className="space-y-3 pt-4 border-t border-white/10">
+          <div className="space-y-3 pt-4 border-t border-border">
             <div>
               <label className="text-sm font-medium text-foreground block">
                 סגנון טקסטורת רקע
@@ -715,14 +695,14 @@ export default function AdminSettings({ classId }: Props) {
                     className={`p-3.5 rounded-xl border text-right transition-all cursor-pointer flex items-start gap-3 ${
                       isSelected
                         ? "bg-violet-500/15 border-violet-500/50 ring-1 ring-violet-500"
-                        : "border-white/10 hover:bg-white/5 opacity-80 hover:opacity-100"
+                        : "border-border bg-black/[0.02] dark:bg-white/[0.02] hover:bg-black/5 dark:hover:bg-white/5 opacity-80 hover:opacity-100"
                     }`}
                   >
-                    <span className="text-2xl p-1.5 rounded-lg bg-white/5 shrink-0">{opt.icon}</span>
+                    <span className="text-2xl p-1.5 rounded-lg bg-black/5 dark:bg-white/5 shrink-0">{opt.icon}</span>
                     <div className="flex flex-col">
                       <span className="text-sm font-bold text-foreground flex items-center gap-1.5">
                         {opt.label}
-                        {isSelected && <Check className="w-3.5 h-3.5 text-violet-400" />}
+                        {isSelected && <Check className="w-3.5 h-3.5 text-violet-500" />}
                       </span>
                       <span className="text-xs text-muted-foreground mt-0.5">{opt.desc}</span>
                     </div>
@@ -733,7 +713,7 @@ export default function AdminSettings({ classId }: Props) {
           </div>
 
           {/* Hebrew Font Personality */}
-          <div className="space-y-3 pt-4 border-t border-white/10">
+          <div className="space-y-3 pt-4 border-t border-border">
             <div>
               <label className="text-sm font-medium text-foreground block">
                 סגנון גופן (טיפוגרפיה בעברית)
@@ -753,17 +733,17 @@ export default function AdminSettings({ classId }: Props) {
                     className={`p-4 rounded-xl border text-right transition-all cursor-pointer flex flex-col justify-between gap-3 ${
                       isSelected
                         ? "bg-violet-500/15 border-violet-500/50 ring-1 ring-violet-500"
-                        : "border-white/10 hover:bg-white/5 opacity-80 hover:opacity-100"
+                        : "border-border bg-black/[0.02] dark:bg-white/[0.02] hover:bg-black/5 dark:hover:bg-white/5 opacity-80 hover:opacity-100"
                     }`}
                   >
                     <div className="flex items-center justify-between w-full">
                       <span className="text-xs font-bold text-foreground flex items-center gap-1.5">
                         {opt.name}
-                        {isSelected && <Check className="w-3.5 h-3.5 text-violet-400" />}
+                        {isSelected && <Check className="w-3.5 h-3.5 text-violet-500" />}
                       </span>
                       <span className="text-[11px] text-muted-foreground">{opt.desc}</span>
                     </div>
-                    <div className={`text-base font-semibold text-foreground p-2.5 rounded-lg bg-white/5 ${opt.className}`}>
+                    <div className={`text-base font-semibold text-foreground p-2.5 rounded-lg bg-black/5 dark:bg-white/5 ${opt.className}`}>
                       שלום כיתה ח׳2 💫
                     </div>
                   </button>
@@ -773,7 +753,7 @@ export default function AdminSettings({ classId }: Props) {
           </div>
 
           {/* Default Color Mode (Dark vs Light) */}
-          <div className="space-y-3 pt-4 border-t border-white/10">
+          <div className="space-y-3 pt-4 border-t border-border">
             <div>
               <label className="text-sm font-medium text-foreground block">
                 מצב תצוגה ראשי (ברירת מחדל למבקרים חדשים)
@@ -789,7 +769,7 @@ export default function AdminSettings({ classId }: Props) {
                 className={`p-3 rounded-xl border flex items-center justify-center gap-2.5 text-sm font-semibold transition-all cursor-pointer ${
                   defaultMode === "dark"
                     ? "bg-violet-500/20 border-violet-500 text-foreground ring-1 ring-violet-500"
-                    : "border-white/10 text-muted-foreground hover:bg-white/5"
+                    : "border-border text-muted-foreground hover:bg-black/5 dark:hover:bg-white/5"
                 }`}
               >
                 <Moon className="w-4 h-4 text-violet-400" />
@@ -802,10 +782,10 @@ export default function AdminSettings({ classId }: Props) {
                 className={`p-3 rounded-xl border flex items-center justify-center gap-2.5 text-sm font-semibold transition-all cursor-pointer ${
                   defaultMode === "light"
                     ? "bg-amber-500/20 border-amber-500 text-foreground ring-1 ring-amber-500"
-                    : "border-white/10 text-muted-foreground hover:bg-white/5"
+                    : "border-border text-muted-foreground hover:bg-black/5 dark:hover:bg-white/5"
                 }`}
               >
-                <Sun className="w-4 h-4 text-amber-400" />
+                <Sun className="w-4 h-4 text-amber-500" />
                 <span>☀️ מצב בהיר (Light)</span>
               </button>
             </div>
@@ -838,7 +818,7 @@ export default function AdminSettings({ classId }: Props) {
                 <div
                   key={item.key}
                   className={`p-3.5 rounded-xl border flex items-center justify-between gap-3 transition-all ${
-                    isEnabled ? "bg-white/[0.04] border-white/15" : "opacity-50 border-white/5 bg-transparent"
+                    isEnabled ? "bg-black/[0.02] dark:bg-white/[0.04] border-border" : "opacity-50 border-border bg-transparent"
                   }`}
                 >
                   <div className="flex items-center gap-3">
@@ -860,7 +840,7 @@ export default function AdminSettings({ classId }: Props) {
                       }
                       className="sr-only peer"
                     />
-                    <div className="w-11 h-6 bg-white/10 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-violet-600" />
+                    <div className="w-11 h-6 bg-black/10 dark:bg-white/10 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-violet-600" />
                   </label>
                 </div>
               );
@@ -882,7 +862,7 @@ export default function AdminSettings({ classId }: Props) {
           </button>
 
           {savedSuccess && (
-            <span className="text-emerald-400 text-sm font-medium flex items-center gap-1.5 animate-fade-in">
+            <span className="text-emerald-700 dark:text-emerald-400 text-sm font-medium flex items-center gap-1.5 animate-fade-in">
               <span>✓</span> ההגדרות נשמרו בהצלחה!
             </span>
           )}

@@ -169,14 +169,13 @@ export default function AdminUsers({ classId }: Props) {
         </div>
 
         <div
-          className="flex rounded-xl p-1 self-start"
-          style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.08)" }}
+          className="flex rounded-xl p-1 self-start bg-black/5 dark:bg-white/5 border border-border"
         >
           <button
             onClick={() => setActiveSubTab("pending")}
             className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-xs font-medium transition-all cursor-pointer ${
               activeSubTab === "pending"
-                ? "bg-violet-600/40 text-violet-200 border border-violet-500/30"
+                ? "bg-violet-500/15 text-violet-700 dark:text-violet-300 border border-violet-500/30"
                 : "text-muted-foreground hover:text-foreground"
             }`}
           >
@@ -192,7 +191,7 @@ export default function AdminUsers({ classId }: Props) {
             onClick={() => setActiveSubTab("approved")}
             className={`px-3.5 py-1.5 rounded-lg text-xs font-medium transition-all cursor-pointer ${
               activeSubTab === "approved"
-                ? "bg-violet-600/40 text-violet-200 border border-violet-500/30"
+                ? "bg-violet-500/15 text-violet-700 dark:text-violet-300 border border-violet-500/30"
                 : "text-muted-foreground hover:text-foreground"
             }`}
           >
@@ -203,7 +202,7 @@ export default function AdminUsers({ classId }: Props) {
             onClick={() => setActiveSubTab("whitelist")}
             className={`px-3.5 py-1.5 rounded-lg text-xs font-medium transition-all cursor-pointer ${
               activeSubTab === "whitelist"
-                ? "bg-violet-600/40 text-violet-200 border border-violet-500/30"
+                ? "bg-violet-500/15 text-violet-700 dark:text-violet-300 border border-violet-500/30"
                 : "text-muted-foreground hover:text-foreground"
             }`}
           >
@@ -246,8 +245,8 @@ export default function AdminUsers({ classId }: Props) {
                       <span
                         className={`text-[11px] px-2 py-0.5 rounded-full font-medium ${
                           user.role === "parent"
-                            ? "bg-purple-500/20 text-purple-300 border border-purple-500/30"
-                            : "bg-blue-500/20 text-blue-300 border border-blue-500/30"
+                            ? "bg-purple-500/15 text-purple-700 dark:text-purple-300 border border-purple-500/30"
+                            : "bg-blue-500/15 text-blue-700 dark:text-blue-300 border border-blue-500/30"
                         }`}
                       >
                         {user.role === "parent" ? "הורה" : "תלמיד/ה"}
@@ -299,26 +298,18 @@ export default function AdminUsers({ classId }: Props) {
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               placeholder="חיפוש לפי שם, אימייל או שם תלמיד..."
-              className="flex-1 rounded-xl px-3.5 py-2 text-xs text-foreground outline-none"
-              style={{
-                background: "rgba(255,255,255,0.06)",
-                border: "1px solid rgba(255,255,255,0.12)",
-              }}
+              className="flex-1 rounded-xl px-3.5 py-2 text-xs text-foreground outline-none bg-[var(--input-bg)] border border-[var(--input-border)] focus:border-[var(--theme-accent)] transition-colors"
             />
 
             <select
               value={filterRole}
               onChange={(e) => setFilterRole(e.target.value)}
-              className="rounded-xl px-3 py-2 text-xs text-foreground outline-none cursor-pointer"
-              style={{
-                background: "rgba(20,20,35,0.9)",
-                border: "1px solid rgba(255,255,255,0.12)",
-              }}
+              className="rounded-xl px-3 py-2 text-xs text-foreground outline-none cursor-pointer bg-[var(--input-bg)] border border-[var(--input-border)] focus:border-[var(--theme-accent)] transition-colors"
             >
-              <option value="all">כל התפקידים</option>
-              <option value="student">תלמידים בלבד</option>
-              <option value="parent">הורים בלבד</option>
-              <option value="admin">מנהלים / מורים</option>
+              <option value="all" className="bg-[var(--card-bg)] text-foreground">כל התפקידים</option>
+              <option value="student" className="bg-[var(--card-bg)] text-foreground">תלמידים בלבד</option>
+              <option value="parent" className="bg-[var(--card-bg)] text-foreground">הורים בלבד</option>
+              <option value="admin" className="bg-[var(--card-bg)] text-foreground">מנהלים / מורים</option>
             </select>
           </div>
 
@@ -344,16 +335,16 @@ export default function AdminUsers({ classId }: Props) {
                       <span
                         className={`text-[10px] px-2 py-0.5 rounded-full font-medium ${
                           user.role === "admin"
-                            ? "bg-amber-500/20 text-amber-300 border border-amber-500/30"
+                            ? "bg-amber-500/15 text-amber-700 dark:text-amber-300 border border-amber-500/30"
                             : user.role === "parent"
-                            ? "bg-purple-500/20 text-purple-300 border border-purple-500/30"
-                            : "bg-blue-500/20 text-blue-300 border border-blue-500/30"
+                            ? "bg-purple-500/15 text-purple-700 dark:text-purple-300 border border-purple-500/30"
+                            : "bg-blue-500/15 text-blue-700 dark:text-blue-300 border border-blue-500/30"
                         }`}
                       >
                         {user.role === "admin" ? "מנהל/ת" : user.role === "parent" ? "הורה" : "תלמיד/ה"}
                       </span>
                       {user.status === "rejected" && (
-                        <span className="text-[10px] px-2 py-0.5 rounded-full bg-red-500/20 text-red-300 border border-red-500/30">
+                        <span className="text-[10px] px-2 py-0.5 rounded-full bg-red-500/15 text-red-700 dark:text-red-300 border border-red-500/30">
                           חסום / נדחה
                         </span>
                       )}
@@ -373,7 +364,7 @@ export default function AdminUsers({ classId }: Props) {
                       <button
                         onClick={() => handleStatusChange(user.uid, "rejected")}
                         disabled={actionLoading === user.uid}
-                        className="px-2.5 py-1.5 rounded-lg text-xs text-amber-300 hover:bg-amber-500/10 border border-amber-500/30 transition-all cursor-pointer"
+                        className="px-2.5 py-1.5 rounded-lg text-xs text-amber-700 dark:text-amber-300 hover:bg-amber-500/10 border border-amber-500/30 transition-all cursor-pointer font-medium"
                         title="השהיית אישור הגישה"
                       >
                         הקפא גישה
@@ -382,7 +373,7 @@ export default function AdminUsers({ classId }: Props) {
                       <button
                         onClick={() => handleStatusChange(user.uid, "approved")}
                         disabled={actionLoading === user.uid}
-                        className="px-2.5 py-1.5 rounded-lg text-xs text-emerald-300 hover:bg-emerald-500/10 border border-emerald-500/30 transition-all cursor-pointer"
+                        className="px-2.5 py-1.5 rounded-lg text-xs text-emerald-700 dark:text-emerald-300 hover:bg-emerald-500/10 border border-emerald-500/30 transition-all cursor-pointer font-medium"
                       >
                         אשר מחדש
                       </button>
@@ -392,7 +383,7 @@ export default function AdminUsers({ classId }: Props) {
                       <button
                         onClick={() => handleRoleChange(user.uid, "admin")}
                         disabled={actionLoading === user.uid}
-                        className="px-2.5 py-1.5 rounded-lg text-xs text-violet-300 hover:bg-violet-500/10 border border-violet-500/30 transition-all cursor-pointer"
+                        className="px-2.5 py-1.5 rounded-lg text-xs text-violet-700 dark:text-violet-300 hover:bg-violet-500/10 border border-violet-500/30 transition-all cursor-pointer font-medium"
                         title="הענק הרשאות ניהול לאתר"
                       >
                         הפוך למנהל
@@ -402,7 +393,7 @@ export default function AdminUsers({ classId }: Props) {
                     <button
                       onClick={() => handleDeleteUser(user.uid, user.fullName)}
                       disabled={actionLoading === user.uid}
-                      className="px-2 py-1.5 rounded-lg text-xs text-red-400 hover:bg-red-500/10 transition-all cursor-pointer"
+                      className="px-2 py-1.5 rounded-lg text-xs text-red-600 dark:text-red-400 hover:bg-red-500/10 transition-all cursor-pointer"
                       title="מחיקת משתמש"
                     >
                       🗑️
@@ -437,11 +428,7 @@ export default function AdminUsers({ classId }: Props) {
               value={newWhitelistInput}
               onChange={(e) => setNewWhitelistInput(e.target.value)}
               placeholder="student1@school.org.il, parent@gmail.com, ..."
-              className="w-full rounded-xl p-3 text-xs font-mono text-foreground outline-none resize-none"
-              style={{
-                background: "rgba(255,255,255,0.06)",
-                border: "1px solid rgba(255,255,255,0.12)",
-              }}
+              className="w-full rounded-xl p-3 text-xs font-mono text-foreground bg-[var(--input-bg)] border border-[var(--input-border)] outline-none resize-none focus:border-[var(--theme-accent)] transition-colors"
               dir="ltr"
             />
 
@@ -474,11 +461,7 @@ export default function AdminUsers({ classId }: Props) {
                 {whitelistEmails.map((email) => (
                   <div
                     key={email}
-                    className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-mono"
-                    style={{
-                      background: "rgba(255,255,255,0.05)",
-                      border: "1px solid rgba(255,255,255,0.1)",
-                    }}
+                    className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-mono bg-black/5 dark:bg-white/5 border border-border text-foreground"
                     dir="ltr"
                   >
                     <span>{email}</span>

@@ -121,7 +121,7 @@ export default function Schedule({ classId, classNameTitle, schoolNameTitle }: S
     <div id="schedule-print-area" className="flex flex-col gap-3.5">
       {/* ── Screen Controls & Mode Switcher ── */}
       <div className="schedule-screen-controls flex items-center justify-between gap-2">
-        <div className="inline-flex p-1 rounded-xl bg-white/[0.04] border border-white/10 text-xs">
+        <div className="inline-flex p-1 rounded-xl bg-black/5 dark:bg-white/[0.04] border border-border text-xs">
           <button
             type="button"
             onClick={() => setViewMode("daily")}
@@ -149,7 +149,7 @@ export default function Schedule({ classId, classNameTitle, schoolNameTitle }: S
         <button
           type="button"
           onClick={handlePrint}
-          className="schedule-print-btn flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all cursor-pointer border border-white/10 hover:border-white/20 bg-white/[0.04] hover:bg-white/[0.08] text-muted-foreground hover:text-foreground active:scale-95"
+          className="schedule-print-btn flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all cursor-pointer border border-border hover:border-foreground/20 bg-card hover:bg-card-hover text-muted-foreground hover:text-foreground active:scale-95"
           title="הדפסת מערכת שעות"
           aria-label="הדפסת מערכת שעות"
         >
@@ -163,7 +163,7 @@ export default function Schedule({ classId, classNameTitle, schoolNameTitle }: S
         {viewMode === "daily" ? (
           <div className="flex flex-col gap-3">
             {/* Day Tabs */}
-            <div className="grid grid-cols-6 gap-1 sm:gap-2 p-1 bg-white/[0.03] border border-[var(--card-border)] rounded-xl">
+            <div className="grid grid-cols-6 gap-1 sm:gap-2 p-1 bg-black/[0.02] dark:bg-white/[0.03] border border-border rounded-xl">
               {DAYS.map((day) => {
                 const isSelected = selectedDay === day;
                 const isToday = todayKey === day;
@@ -176,7 +176,7 @@ export default function Schedule({ classId, classNameTitle, schoolNameTitle }: S
                     className={`flex flex-col items-center justify-center py-2 px-1 rounded-lg transition-all cursor-pointer relative ${
                       isSelected
                         ? "bg-[rgba(var(--theme-accent-rgb),0.18)] border border-[rgba(var(--theme-accent-rgb),0.45)] text-[var(--theme-accent)] font-bold shadow-xs"
-                        : "text-muted-foreground hover:text-foreground hover:bg-white/[0.04] border border-transparent"
+                        : "text-muted-foreground hover:text-foreground hover:bg-black/5 dark:hover:bg-white/[0.04] border border-transparent"
                     }`}
                   >
                     <span className="text-xs sm:text-sm">{DAY_LABELS[day]}</span>
@@ -197,7 +197,7 @@ export default function Schedule({ classId, classNameTitle, schoolNameTitle }: S
                   return (
                     <div
                       key={row.id}
-                      className="flex items-center justify-between py-2 px-3.5 rounded-xl bg-[rgba(var(--theme-accent-rgb),0.06)] border border-[rgba(var(--theme-accent-rgb),0.15)] text-xs text-foreground/85"
+                      className="flex items-center justify-between py-2 px-3.5 rounded-xl bg-[rgba(var(--theme-accent-rgb),0.07)] border border-[rgba(var(--theme-accent-rgb),0.2)] text-xs text-foreground"
                     >
                       <div className="flex items-center gap-2">
                         <span className="text-sm">☕</span>
@@ -219,7 +219,7 @@ export default function Schedule({ classId, classNameTitle, schoolNameTitle }: S
                     className={`flex items-center justify-between p-3 rounded-xl border transition-all ${
                       hasLesson
                         ? "bg-[var(--card-bg)] border-[var(--card-border)] shadow-xs"
-                        : "bg-white/[0.02] border-white/5 opacity-50"
+                        : "bg-black/[0.02] dark:bg-white/[0.02] border-border/40 opacity-60"
                     }`}
                   >
                     <div className="flex items-center gap-3">

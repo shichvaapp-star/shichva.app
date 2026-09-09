@@ -798,7 +798,7 @@ export default function AdminAnnouncements({ classId }: Props) {
                             <button
                               type="button"
                               onClick={() => editFileInputRef.current?.click()}
-                              className="text-purple-400 hover:text-purple-300 underline"
+                              className="text-violet-700 dark:text-purple-300 hover:text-violet-800 dark:hover:text-purple-200 underline font-medium"
                             >
                               {editFile || (editImageUrl && !editRemoveImage) ? "החלף" : "הוסף"}
                             </button>
@@ -809,7 +809,7 @@ export default function AdminAnnouncements({ classId }: Props) {
                                   clearEditFile();
                                   setEditRemoveImage(true);
                                 }}
-                                className="text-red-400 hover:text-red-300 underline"
+                                className="text-red-700 dark:text-red-300 hover:text-red-800 dark:hover:text-red-200 underline font-medium"
                               >
                                 הסר
                               </button>
@@ -870,7 +870,7 @@ export default function AdminAnnouncements({ classId }: Props) {
                             />
                             <span>חשוב</span>
                           </label>
-                          <label className="flex items-center gap-1 cursor-pointer select-none text-amber-400" title="הסתר הודעה מהאתר">
+                          <label className="flex items-center gap-1 cursor-pointer select-none text-amber-700 dark:text-amber-400 font-medium" title="הסתר הודעה מהאתר">
                             <input
                               type="checkbox"
                               checked={editHidden}
@@ -1015,12 +1015,12 @@ export default function AdminAnnouncements({ classId }: Props) {
                       <td style={{ textAlign: "center" }}>
                         <div className="flex flex-col items-center gap-0.5 text-xs">
                           {item.important && (
-                            <span className="text-red-400 font-medium text-[11px]" title="הודעה חשובה">
+                            <span className="text-red-700 dark:text-red-400 font-medium text-[11px]" title="הודעה חשובה">
                               חשוב
                             </span>
                           )}
                           {item.hidden && (
-                            <span className="text-amber-400 font-medium text-[11px]" title="הודעה מוסתרת מהאתר">
+                            <span className="text-amber-700 dark:text-amber-400 font-medium text-[11px]" title="הודעה מוסתרת מהאתר">
                               מוסתר
                             </span>
                           )}

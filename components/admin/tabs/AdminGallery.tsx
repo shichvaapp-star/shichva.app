@@ -119,10 +119,10 @@ export default function AdminGallery({ classId }: Props) {
           onClick={() => fileInputRef.current?.click()}
         >
           <span style={{ fontSize: "2rem" }}>📷</span>
-          <p style={{ fontSize: "0.9rem", color: "#94a3b8", marginTop: 6 }}>
+          <p className="text-sm text-foreground/85 font-medium mt-1.5">
             לחץ לבחירת תמונות או גרור לכאן
           </p>
-          <p style={{ fontSize: "0.75rem", color: "#475569", marginTop: 2 }}>
+          <p className="text-xs text-muted-foreground mt-0.5">
             JPG, PNG, WEBP · ניתן לבחור מספר תמונות בבת אחת
           </p>
         </div>
@@ -144,8 +144,8 @@ export default function AdminGallery({ classId }: Props) {
                   <span>{u.name}</span>
                   <span>{u.progress}%</span>
                 </div>
-                <div style={{ height: 4, background: "rgba(255,255,255,0.08)", borderRadius: 2 }}>
-                  <div style={{ width: `${u.progress}%`, height: "100%", background: "#7c3aed", borderRadius: 2, transition: "width 0.2s" }} />
+                <div className="h-1 bg-black/10 dark:bg-white/10 rounded-full overflow-hidden">
+                  <div style={{ width: `${u.progress}%`, height: "100%", backgroundColor: "var(--theme-accent)", transition: "width 0.2s" }} />
                 </div>
               </div>
             ))}

@@ -154,7 +154,7 @@ export default function Announcements({ classId }: { classId: string }) {
                 {hasContent && (
                   <button
                     type="button"
-                    className="p-1 rounded-lg text-muted-foreground group-hover:text-foreground group-hover:bg-white/5 transition-all mt-0.5 cursor-pointer"
+                    className="p-1 rounded-lg text-muted-foreground group-hover:text-foreground group-hover:bg-black/5 dark:group-hover:bg-white/5 transition-all mt-0.5 cursor-pointer"
                     aria-label={isExpanded ? "כווץ הודעה" : "הרחב הודעה"}
                   >
                     <ChevronDown
@@ -167,7 +167,7 @@ export default function Announcements({ classId }: { classId: string }) {
               </div>
 
               {hasContent && isExpanded && (
-                <div className="mt-3 pt-3 border-t border-white/5 space-y-3 animate-in fade-in duration-200">
+                <div className="mt-3 pt-3 border-t border-border space-y-3 animate-in fade-in duration-200">
                   {ann.body && (
                     <p className="text-sm text-muted-foreground leading-relaxed whitespace-pre-line">
                       {ann.body}

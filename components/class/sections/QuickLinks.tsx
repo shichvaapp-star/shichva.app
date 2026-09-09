@@ -33,7 +33,7 @@ export default function QuickLinks() {
             href={link.url}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex flex-col items-center justify-center gap-2 py-4 px-3 rounded-xl text-sm font-bold text-foreground bg-white/5 border border-white/10 hover:bg-white/10 hover:border-white/20 transition-all duration-200 text-center"
+            className="flex flex-col items-center justify-center gap-2 py-4 px-3 rounded-xl text-sm font-bold text-foreground bg-[var(--card-bg)] border border-[var(--card-border)] hover:bg-[var(--card-hover-bg)] hover:border-[var(--card-hover-border)] transition-all duration-200 text-center shadow-xs"
           >
             <Image
               src={link.icon}
@@ -52,15 +52,15 @@ export default function QuickLinks() {
         href={featured.url}
         target="_blank"
         rel="noopener noreferrer"
-        className="flex items-center justify-center gap-3 py-5 px-4 rounded-xl font-bold text-foreground border border-purple-500/30 hover:border-purple-400/60 transition-all duration-200"
+        className="flex items-center justify-center gap-3 py-5 px-4 rounded-xl font-bold text-foreground border border-purple-500/30 hover:border-purple-400/60 transition-all duration-200 shadow-xs"
         style={{
-          background: "linear-gradient(135deg, rgba(109,40,217,0.25) 0%, rgba(67,56,202,0.2) 100%)",
+          background: "linear-gradient(135deg, rgba(109,40,217,0.2) 0%, rgba(67,56,202,0.15) 100%)",
         }}
       >
         <Image src={featured.icon} alt="NotebookLM" width={32} height={32} style={{ filter: "var(--logo-filter)" }} />
         <div className="flex flex-col items-start">
-          <span className="text-base">{featured.label}</span>
-          <span className="text-xs text-muted-foreground">{featured.sublabel}</span>
+          <span className="text-base font-bold">{featured.label}</span>
+          <span className="text-xs text-foreground/75 font-medium">{featured.sublabel}</span>
         </div>
       </a>
     </div>

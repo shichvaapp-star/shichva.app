@@ -252,12 +252,12 @@ export default function AdminEmergencySchedule({ classId }: Props) {
           <div className="admin-palette" style={{ borderColor: "rgba(251,146,60,0.25)" }}>
             <p className="admin-palette-title">מקצועות</p>
             <div className="admin-palette-list">
-              {subjects.length === 0 && <p style={{ fontSize: "0.78rem", color: "#475569" }}>טרם נוספו</p>}
+              {subjects.length === 0 && <p className="text-xs text-muted-foreground">טרם נוספו</p>}
               {subjects.map((s) => (
                 <div key={s} className="admin-palette-row">
                   <div
-                    className={`admin-palette-chip${dragSubject === s ? " dragging" : ""}`}
-                    style={{ background: "rgba(251,146,60,0.15)", borderColor: "rgba(251,146,60,0.3)", color: "#fdba74" }}
+                    className={`admin-palette-chip${dragSubject === s ? " dragging" : ""} text-orange-700 dark:text-orange-300 font-medium`}
+                    style={{ background: "rgba(251,146,60,0.15)", borderColor: "rgba(251,146,60,0.3)" }}
                     draggable
                     onDragStart={(e) => { e.dataTransfer.setData("text/plain", s); setDragSubject(s); }}
                     onDragEnd={() => { setDragSubject(""); setDragOverKey(""); }}
@@ -313,7 +313,7 @@ export default function AdminEmergencySchedule({ classId }: Props) {
                             <input className="inline-input" value={timeValue} autoFocus onChange={(e) => setTimeValue(e.target.value)}
                               onKeyDown={(e) => { if (e.key === "Enter") saveTime(row.id); if (e.key === "Escape") setEditingTimeId(null); }}
                               onBlur={() => saveTime(row.id)} style={{ width: 90, direction: "ltr" }} />
-                          ) : row.time || <span style={{ color: "#334155" }}>--:--</span>}
+                          ) : row.time || <span className="text-muted-foreground/60">--:--</span>}
                         </td>
                         <td colSpan={6}>{row.sun}</td>
                         <td><button className="admin-palette-remove" onClick={() => deleteRow(row.id)}>×</button></td>
@@ -322,13 +322,13 @@ export default function AdminEmergencySchedule({ classId }: Props) {
                   }
                   return (
                     <tr key={row.id}>
-                      <td className="sched-period" style={{ color: "#fb923c" }}>{row.period}</td>
+                      <td className="sched-period font-bold text-orange-700 dark:text-orange-400">{row.period}</td>
                       <td style={{ cursor: "pointer" }} onClick={() => { setEditingTimeId(row.id); setTimeValue(row.time); }}>
                         {editingTimeId === row.id ? (
                           <input className="inline-input" value={timeValue} autoFocus onChange={(e) => setTimeValue(e.target.value)}
                             onKeyDown={(e) => { if (e.key === "Enter") saveTime(row.id); if (e.key === "Escape") setEditingTimeId(null); }}
                             onBlur={() => saveTime(row.id)} style={{ width: 90, direction: "ltr" }} />
-                        ) : <span className="sched-time">{row.time || <span style={{ color: "#334155" }}>--:--</span>}</span>}
+                        ) : <span className="sched-time">{row.time || <span className="text-muted-foreground/60">--:--</span>}</span>}
                       </td>
                       {DAYS.map((day) => {
                         const key = `${row.id}-${day}`;
@@ -343,7 +343,7 @@ export default function AdminEmergencySchedule({ classId }: Props) {
                             onDragLeave={(e) => { if (!e.currentTarget.contains(e.relatedTarget as Node)) setDragOverKey(""); }}
                             onDrop={() => dropOnCell(row.id, day)}
                           >
-                            {isSaving ? <span style={{ color: "#fb923c", fontSize: "0.72rem" }}>⟳</span> : (val || "")}
+                            {isSaving ? <span className="text-orange-700 dark:text-orange-400 text-[0.72rem]">⟳</span> : (val || "")}
                           </td>
                         );
                       })}

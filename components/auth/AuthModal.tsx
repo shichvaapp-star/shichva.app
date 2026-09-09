@@ -165,10 +165,9 @@ export default function AuthModal({
           </div>
         </div>
 
-        {/* Tab switch */}
+        {/* Tab Switcher */}
         <div
-          className="flex rounded-xl p-1 mb-6"
-          style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.08)" }}
+          className="flex rounded-xl p-1 mb-6 bg-black/5 dark:bg-white/5 border border-border"
         >
           <button
             type="button"
@@ -178,7 +177,7 @@ export default function AuthModal({
             }}
             className={`flex-1 py-2 text-sm font-medium rounded-lg transition-all cursor-pointer ${
               !isRegister
-                ? "bg-violet-600/30 text-violet-200 border border-violet-500/30 shadow-sm"
+                ? "bg-violet-500/15 text-violet-700 dark:text-violet-300 border border-violet-500/30 shadow-xs font-semibold"
                 : "text-muted-foreground hover:text-foreground"
             }`}
           >
@@ -192,7 +191,7 @@ export default function AuthModal({
             }}
             className={`flex-1 py-2 text-sm font-medium rounded-lg transition-all cursor-pointer ${
               isRegister
-                ? "bg-violet-600/30 text-violet-200 border border-violet-500/30 shadow-sm"
+                ? "bg-violet-500/15 text-violet-700 dark:text-violet-300 border border-violet-500/30 shadow-xs font-semibold"
                 : "text-muted-foreground hover:text-foreground"
             }`}
           >
@@ -211,11 +210,7 @@ export default function AuthModal({
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="your@email.com"
                 required
-                className="w-full rounded-lg px-3.5 py-2.5 text-sm text-foreground outline-none transition-all placeholder:text-muted-foreground/40"
-                style={{
-                  background: "rgba(255,255,255,0.06)",
-                  border: "1px solid rgba(255,255,255,0.12)",
-                }}
+                className="w-full rounded-lg px-3.5 py-2.5 text-sm text-foreground outline-none transition-all placeholder:text-muted-foreground/40 bg-[var(--input-bg)] border border-[var(--input-border)] focus:border-[var(--theme-accent)]"
                 dir="ltr"
               />
             </div>
@@ -228,17 +223,13 @@ export default function AuthModal({
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="••••••••"
                 required
-                className="w-full rounded-lg px-3.5 py-2.5 text-sm text-foreground outline-none transition-all placeholder:text-muted-foreground/40"
-                style={{
-                  background: "rgba(255,255,255,0.06)",
-                  border: "1px solid rgba(255,255,255,0.12)",
-                }}
+                className="w-full rounded-lg px-3.5 py-2.5 text-sm text-foreground outline-none transition-all placeholder:text-muted-foreground/40 bg-[var(--input-bg)] border border-[var(--input-border)] focus:border-[var(--theme-accent)]"
                 dir="ltr"
               />
             </div>
 
             {error && (
-              <div className="p-2.5 rounded-lg bg-red-500/10 border border-red-500/20 text-red-400 text-xs text-center">
+              <div className="p-2.5 rounded-lg bg-red-500/10 border border-red-500/20 text-red-700 dark:text-red-400 text-xs text-center font-medium">
                 {error}
               </div>
             )}
@@ -263,11 +254,7 @@ export default function AuthModal({
                 onChange={(e) => setFullName(e.target.value)}
                 placeholder="למשל: דניאל ישראלי"
                 required
-                className="w-full rounded-lg px-3.5 py-2.5 text-sm text-foreground outline-none transition-all placeholder:text-muted-foreground/40"
-                style={{
-                  background: "rgba(255,255,255,0.06)",
-                  border: "1px solid rgba(255,255,255,0.12)",
-                }}
+                className="w-full rounded-lg px-3.5 py-2.5 text-sm text-foreground outline-none transition-all placeholder:text-muted-foreground/40 bg-[var(--input-bg)] border border-[var(--input-border)] focus:border-[var(--theme-accent)]"
               />
             </div>
 
@@ -279,8 +266,8 @@ export default function AuthModal({
                   onClick={() => setRole("student")}
                   className={`py-2 text-xs rounded-lg font-medium transition-all cursor-pointer ${
                     role === "student"
-                      ? "bg-violet-600/40 text-violet-200 border border-violet-500/50"
-                      : "bg-white/5 text-muted-foreground border border-white/10 hover:bg-white/10"
+                      ? "bg-violet-500/15 text-violet-700 dark:text-violet-300 border border-violet-500/40 font-semibold"
+                      : "bg-black/5 dark:bg-white/5 text-muted-foreground border border-border hover:bg-black/10 dark:hover:bg-white/10"
                   }`}
                 >
                   🎓 תלמיד/ה בכיתה
@@ -290,8 +277,8 @@ export default function AuthModal({
                   onClick={() => setRole("parent")}
                   className={`py-2 text-xs rounded-lg font-medium transition-all cursor-pointer ${
                     role === "parent"
-                      ? "bg-violet-600/40 text-violet-200 border border-violet-500/50"
-                      : "bg-white/5 text-muted-foreground border border-white/10 hover:bg-white/10"
+                      ? "bg-violet-500/15 text-violet-700 dark:text-violet-300 border border-violet-500/40 font-semibold"
+                      : "bg-black/5 dark:bg-white/5 text-muted-foreground border border-border hover:bg-black/10 dark:hover:bg-white/10"
                   }`}
                 >
                   👨‍👩‍👧 הורה
@@ -308,11 +295,7 @@ export default function AuthModal({
                   onChange={(e) => setStudentName(e.target.value)}
                   placeholder="שם הבן/הבת בכיתה"
                   required
-                  className="w-full rounded-lg px-3.5 py-2.5 text-sm text-foreground outline-none transition-all placeholder:text-muted-foreground/40"
-                  style={{
-                    background: "rgba(255,255,255,0.06)",
-                    border: "1px solid rgba(255,255,255,0.12)",
-                  }}
+                  className="w-full rounded-lg px-3.5 py-2.5 text-sm text-foreground outline-none transition-all placeholder:text-muted-foreground/40 bg-[var(--input-bg)] border border-[var(--input-border)] focus:border-[var(--theme-accent)]"
                 />
               </div>
             )}
@@ -325,11 +308,7 @@ export default function AuthModal({
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="your@email.com"
                 required
-                className="w-full rounded-lg px-3.5 py-2.5 text-sm text-foreground outline-none transition-all placeholder:text-muted-foreground/40"
-                style={{
-                  background: "rgba(255,255,255,0.06)",
-                  border: "1px solid rgba(255,255,255,0.12)",
-                }}
+                className="w-full rounded-lg px-3.5 py-2.5 text-sm text-foreground outline-none transition-all placeholder:text-muted-foreground/40 bg-[var(--input-bg)] border border-[var(--input-border)] focus:border-[var(--theme-accent)]"
                 dir="ltr"
               />
             </div>
@@ -343,17 +322,13 @@ export default function AuthModal({
                 placeholder="••••••••"
                 required
                 minLength={6}
-                className="w-full rounded-lg px-3.5 py-2.5 text-sm text-foreground outline-none transition-all placeholder:text-muted-foreground/40"
-                style={{
-                  background: "rgba(255,255,255,0.06)",
-                  border: "1px solid rgba(255,255,255,0.12)",
-                }}
+                className="w-full rounded-lg px-3.5 py-2.5 text-sm text-foreground outline-none transition-all placeholder:text-muted-foreground/40 bg-[var(--input-bg)] border border-[var(--input-border)] focus:border-[var(--theme-accent)]"
                 dir="ltr"
               />
             </div>
 
             {error && (
-              <div className="p-2.5 rounded-lg bg-red-500/10 border border-red-500/20 text-red-400 text-xs text-center">
+              <div className="p-2.5 rounded-lg bg-red-500/10 border border-red-500/20 text-red-700 dark:text-red-400 text-xs text-center font-medium">
                 {error}
               </div>
             )}

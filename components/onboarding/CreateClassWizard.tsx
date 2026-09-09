@@ -356,7 +356,7 @@ export default function CreateClassWizard() {
       <div className="w-full max-w-xl relative z-10">
         {/* Top Header */}
         <div className="text-center mb-8">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-violet-500/10 border border-violet-500/30 text-violet-300 text-xs font-medium mb-4">
+          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-violet-500/10 border border-violet-500/30 text-violet-700 dark:text-violet-300 text-xs font-medium mb-4">
             <Sparkles className="w-3.5 h-3.5" />
             <span>פתיחת אתר כיתה חדש תוך דקה</span>
           </div>
@@ -372,21 +372,21 @@ export default function CreateClassWizard() {
         {step < 4 && (
           <div className="flex items-center justify-center gap-3 mb-8">
             <div className={`flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold transition-all ${
-              step === 1 ? "bg-violet-600 text-white" : "bg-white/5 text-muted-foreground"
+              step === 1 ? "bg-violet-600 text-white" : "bg-black/5 dark:bg-white/5 text-muted-foreground"
             }`}>
               <span>1</span>
               <span>פרטי מורה</span>
             </div>
-            <span className="text-white/20">──</span>
+            <span className="text-muted-foreground/40">──</span>
             <div className={`flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold transition-all ${
-              step === 2 ? "bg-violet-600 text-white" : "bg-white/5 text-muted-foreground"
+              step === 2 ? "bg-violet-600 text-white" : "bg-black/5 dark:bg-white/5 text-muted-foreground"
             }`}>
               <span>2</span>
               <span>פרטי כיתה</span>
             </div>
-            <span className="text-white/20">──</span>
+            <span className="text-muted-foreground/40">──</span>
             <div className={`flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold transition-all ${
-              step === 3 ? "bg-violet-600 text-white" : "bg-white/5 text-muted-foreground"
+              step === 3 ? "bg-violet-600 text-white" : "bg-black/5 dark:bg-white/5 text-muted-foreground"
             }`}>
               <span>3</span>
               <span>עיצוב</span>
@@ -405,7 +405,7 @@ export default function CreateClassWizard() {
           }}
         >
           {errorMessage && (
-            <div className="mb-6 p-3.5 rounded-xl bg-red-500/10 border border-red-500/30 text-red-300 text-xs text-center font-medium">
+            <div className="mb-6 p-3.5 rounded-xl bg-red-500/10 border border-red-500/30 text-red-700 dark:text-red-300 text-xs text-center font-medium">
               {errorMessage}
             </div>
           )}
@@ -431,7 +431,7 @@ export default function CreateClassWizard() {
                       <p className="text-xs text-muted-foreground">{currentUser.email}</p>
                     </div>
                   </div>
-                  <span className="text-xs text-violet-300 font-bold bg-violet-500/20 px-2.5 py-1 rounded-full">
+                  <span className="text-xs text-violet-700 dark:text-violet-300 font-bold bg-violet-500/15 px-2.5 py-1 rounded-full">
                     מחובר
                   </span>
                 </div>
@@ -445,11 +445,7 @@ export default function CreateClassWizard() {
                       onChange={(e) => setFullName(e.target.value)}
                       placeholder="לדוגמה: יעל כהן"
                       required
-                      className="w-full rounded-xl px-3.5 py-2.5 text-sm text-foreground outline-none transition-all"
-                      style={{
-                        background: "rgba(255,255,255,0.06)",
-                        border: "1px solid rgba(255,255,255,0.12)",
-                      }}
+                      className="w-full rounded-xl px-3.5 py-2.5 text-sm text-foreground outline-none transition-all bg-[var(--input-bg)] border border-[var(--input-border)] focus:border-[var(--theme-accent)]"
                     />
                   </div>
 
@@ -462,11 +458,7 @@ export default function CreateClassWizard() {
                       placeholder="teacher@school.org.il"
                       required
                       dir="ltr"
-                      className="w-full rounded-xl px-3.5 py-2.5 text-sm text-foreground outline-none transition-all"
-                      style={{
-                        background: "rgba(255,255,255,0.06)",
-                        border: "1px solid rgba(255,255,255,0.12)",
-                      }}
+                      className="w-full rounded-xl px-3.5 py-2.5 text-sm text-foreground outline-none transition-all bg-[var(--input-bg)] border border-[var(--input-border)] focus:border-[var(--theme-accent)]"
                     />
                   </div>
 
@@ -480,11 +472,7 @@ export default function CreateClassWizard() {
                       required
                       minLength={6}
                       dir="ltr"
-                      className="w-full rounded-xl px-3.5 py-2.5 text-sm text-foreground outline-none transition-all"
-                      style={{
-                        background: "rgba(255,255,255,0.06)",
-                        border: "1px solid rgba(255,255,255,0.12)",
-                      }}
+                      className="w-full rounded-xl px-3.5 py-2.5 text-sm text-foreground outline-none transition-all bg-[var(--input-bg)] border border-[var(--input-border)] focus:border-[var(--theme-accent)]"
                     />
                   </div>
                 </>
@@ -526,11 +514,7 @@ export default function CreateClassWizard() {
                   onChange={(e) => setSchoolName(e.target.value)}
                   placeholder="לדוגמה: חטיבת אלון, רעננה"
                   required
-                  className="w-full rounded-xl px-3.5 py-2.5 text-sm text-foreground outline-none transition-all"
-                  style={{
-                    background: "rgba(255,255,255,0.06)",
-                    border: "1px solid rgba(255,255,255,0.12)",
-                  }}
+                  className="w-full rounded-xl px-3.5 py-2.5 text-sm text-foreground outline-none transition-all bg-[var(--input-bg)] border border-[var(--input-border)] focus:border-[var(--theme-accent)]"
                 />
               </div>
 
@@ -542,11 +526,7 @@ export default function CreateClassWizard() {
                   onChange={(e) => setClassName(e.target.value)}
                   placeholder="לדוגמה: כיתה ט׳3"
                   required
-                  className="w-full rounded-xl px-3.5 py-2.5 text-sm text-foreground outline-none transition-all"
-                  style={{
-                    background: "rgba(255,255,255,0.06)",
-                    border: "1px solid rgba(255,255,255,0.12)",
-                  }}
+                  className="w-full rounded-xl px-3.5 py-2.5 text-sm text-foreground outline-none transition-all bg-[var(--input-bg)] border border-[var(--input-border)] focus:border-[var(--theme-accent)]"
                 />
               </div>
 
@@ -556,29 +536,19 @@ export default function CreateClassWizard() {
                   {slugStatus.checking ? (
                     <span className="text-[11px] text-muted-foreground">בודק זמינות...</span>
                   ) : slugStatus.available ? (
-                    <span className="text-[11px] text-emerald-400 font-semibold flex items-center gap-1">
+                    <span className="text-[11px] text-emerald-700 dark:text-emerald-400 font-semibold flex items-center gap-1">
                       <Check className="w-3 h-3" /> הכתובת פנויה
                     </span>
                   ) : slug.trim() ? (
-                    <span className="text-[11px] text-amber-400 font-semibold">
+                    <span className="text-[11px] text-amber-700 dark:text-amber-400 font-semibold">
                       {slugStatus.message || "לא זמין"}
                     </span>
                   ) : null}
                 </div>
 
                 <div
-                  className="flex items-center rounded-xl px-3.5 py-2.5 text-sm transition-all"
+                  className="flex items-center rounded-xl px-3.5 py-2.5 text-sm transition-all bg-[var(--input-bg)] border border-[var(--input-border)]"
                   dir="ltr"
-                  style={{
-                    background: "rgba(255,255,255,0.06)",
-                    border: `1px solid ${
-                      slugStatus.available
-                        ? "rgba(16, 185, 129, 0.5)"
-                        : slugStatus.message
-                        ? "rgba(245, 158, 11, 0.5)"
-                        : "rgba(255,255,255,0.12)"
-                    }`,
-                  }}
                 >
                   <span className="text-muted-foreground select-none font-mono">
                     {hostname}/
@@ -601,15 +571,11 @@ export default function CreateClassWizard() {
               </div>
 
               {/* Optional School Logo */}
-              <div className="flex flex-col gap-2 pt-3 border-t border-white/10">
+              <div className="flex flex-col gap-2 pt-3 border-t border-border">
                 <label className="text-xs font-semibold text-foreground">סמל בית הספר (אופציונלי)</label>
                 <div className="flex items-center gap-3">
                   <div
-                    className="w-14 h-14 rounded-xl flex items-center justify-center p-1.5 shrink-0 border"
-                    style={{
-                      background: "rgba(255,255,255,0.04)",
-                      borderColor: "rgba(255,255,255,0.12)",
-                    }}
+                    className="w-14 h-14 rounded-xl flex items-center justify-center p-1.5 shrink-0 border border-border bg-black/5 dark:bg-white/[0.04]"
                   >
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
@@ -772,36 +738,28 @@ export default function CreateClassWizard() {
                     value={mascot}
                     onChange={(e) => setMascot(e.target.value.slice(0, 4))}
                     placeholder="אימוג׳י..."
-                    className="w-20 rounded-xl px-2.5 py-1 text-xs text-foreground outline-none text-center"
-                    style={{
-                      background: "rgba(255,255,255,0.06)",
-                      border: "1px solid rgba(255,255,255,0.12)",
-                    }}
+                    className="w-20 rounded-xl px-2.5 py-1 text-xs text-foreground outline-none text-center bg-[var(--input-bg)] border border-[var(--input-border)] focus:border-[var(--theme-accent)]"
                   />
                 </div>
               </div>
 
               {/* Class Motto */}
-              <div className="flex flex-col gap-1.5 pt-2 border-t border-white/10">
+              <div className="flex flex-col gap-1.5 pt-2 border-t border-border">
                 <label className="text-xs font-semibold text-foreground">מוטו או משפט פתיחה (אופציונלי)</label>
                 <input
                   type="text"
                   value={motto}
                   onChange={(e) => setMotto(e.target.value)}
                   placeholder="לדוגמה: ״לומדים, גדלים ומצליחים ביחד!״"
-                  className="w-full rounded-xl px-3.5 py-2.5 text-sm text-foreground outline-none transition-all"
-                  style={{
-                    background: "rgba(255,255,255,0.06)",
-                    border: "1px solid rgba(255,255,255,0.12)",
-                  }}
+                  className="w-full rounded-xl px-3.5 py-2.5 text-sm text-foreground outline-none transition-all bg-[var(--input-bg)] border border-[var(--input-border)] focus:border-[var(--theme-accent)]"
                 />
               </div>
 
               {/* Hero Cover Banner (Optional) */}
-              <div className="flex flex-col gap-2 pt-2 border-t border-white/10">
+              <div className="flex flex-col gap-2 pt-2 border-t border-border">
                 <label className="text-xs font-semibold text-foreground">תמונת נושא עליונה / Cover (אופציונלי)</label>
                 {coverUrl ? (
-                  <div className="relative w-full h-32 rounded-xl overflow-hidden border border-white/15 group">
+                  <div className="relative w-full h-32 rounded-xl overflow-hidden border border-border group">
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img src={coverUrl} alt="תמונת נושא" className="w-full h-full object-cover" />
                     <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
@@ -824,9 +782,9 @@ export default function CreateClassWizard() {
                 ) : (
                   <div
                     onClick={() => coverInputRef.current?.click()}
-                    className="border border-dashed border-white/15 rounded-xl p-3.5 flex items-center justify-center gap-2 hover:border-violet-500/50 hover:bg-white/5 transition-all cursor-pointer text-xs text-muted-foreground hover:text-foreground"
+                    className="border border-dashed border-border rounded-xl p-3.5 flex items-center justify-center gap-2 hover:border-violet-500/50 hover:bg-black/5 dark:hover:bg-white/5 transition-all cursor-pointer text-xs text-muted-foreground hover:text-foreground"
                   >
-                    <ImageIcon className="w-4 h-4 text-violet-400" />
+                    <ImageIcon className="w-4 h-4 text-violet-500" />
                     <span>{uploadingCover ? "מעלה תמונת נושא..." : "העלאת תמונת נושא פנורמית (16:9)"}</span>
                   </div>
                 )}
@@ -843,14 +801,14 @@ export default function CreateClassWizard() {
               </div>
 
               {/* Advanced Design Settings Accordion */}
-              <div className="pt-2 border-t border-white/10">
+              <div className="pt-2 border-t border-border">
                 <button
                   type="button"
                   onClick={() => setShowAdvancedDesign(!showAdvancedDesign)}
-                  className="w-full py-2 px-3 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-xs font-semibold text-foreground flex items-center justify-between transition-all cursor-pointer"
+                  className="w-full py-2 px-3 rounded-xl bg-black/5 dark:bg-white/5 hover:bg-black/10 dark:hover:bg-white/10 border border-border text-xs font-semibold text-foreground flex items-center justify-between transition-all cursor-pointer"
                 >
                   <span className="flex items-center gap-1.5">
-                    <Sliders className="w-3.5 h-3.5 text-violet-400" />
+                    <Sliders className="w-3.5 h-3.5 text-violet-500" />
                     <span>הגדרות עיצוב נוספות (גופן, רקע, מצב תצוגה ומודולים)</span>
                   </span>
                   {showAdvancedDesign ? <ChevronUp className="w-4 h-4 text-muted-foreground" /> : <ChevronDown className="w-4 h-4 text-muted-foreground" />}
@@ -870,7 +828,7 @@ export default function CreateClassWizard() {
                             className={`p-2.5 rounded-xl border text-right transition-all cursor-pointer flex items-center gap-2.5 ${
                               bgStyle === opt.id
                                 ? "bg-violet-500/15 border-violet-500/50 ring-1 ring-violet-500"
-                                : "border-white/10 hover:bg-white/5 opacity-80 hover:opacity-100"
+                                : "border-border hover:bg-black/5 dark:hover:bg-white/5 opacity-80 hover:opacity-100"
                             }`}
                           >
                             <span className="text-lg">{opt.icon}</span>
@@ -895,7 +853,7 @@ export default function CreateClassWizard() {
                             className={`p-2.5 rounded-xl border text-right transition-all cursor-pointer flex flex-col gap-1 ${
                               fontStyle === opt.id
                                 ? "bg-violet-500/15 border-violet-500/50 ring-1 ring-violet-500"
-                                : "border-white/10 hover:bg-white/5 opacity-80 hover:opacity-100"
+                                : "border-border hover:bg-black/5 dark:hover:bg-white/5 opacity-80 hover:opacity-100"
                             }`}
                           >
                             <span className="text-xs font-bold text-foreground">{opt.name}</span>
@@ -915,7 +873,7 @@ export default function CreateClassWizard() {
                           className={`p-2.5 rounded-xl border flex items-center justify-center gap-2 text-xs font-semibold transition-all cursor-pointer ${
                             defaultMode === "dark"
                               ? "bg-violet-500/20 border-violet-500 text-foreground ring-1 ring-violet-500"
-                              : "border-white/10 text-muted-foreground hover:bg-white/5"
+                              : "border-border text-muted-foreground hover:bg-black/5 dark:hover:bg-white/5"
                           }`}
                         >
                           <Moon className="w-3.5 h-3.5 text-violet-400" />
@@ -927,10 +885,10 @@ export default function CreateClassWizard() {
                           className={`p-2.5 rounded-xl border flex items-center justify-center gap-2 text-xs font-semibold transition-all cursor-pointer ${
                             defaultMode === "light"
                               ? "bg-amber-500/20 border-amber-500 text-foreground ring-1 ring-amber-500"
-                              : "border-white/10 text-muted-foreground hover:bg-white/5"
+                              : "border-border text-muted-foreground hover:bg-black/5 dark:hover:bg-white/5"
                           }`}
                         >
-                          <Sun className="w-3.5 h-3.5 text-amber-400" />
+                          <Sun className="w-3.5 h-3.5 text-amber-500" />
                           <span>☀️ מצב בהיר (Light)</span>
                         </button>
                       </div>
@@ -946,7 +904,7 @@ export default function CreateClassWizard() {
                             <label
                               key={item.key}
                               className={`p-2 rounded-xl border flex items-center justify-between gap-2 transition-all cursor-pointer ${
-                                isEnabled ? "bg-white/[0.04] border-white/15" : "opacity-40 border-white/5"
+                                isEnabled ? "bg-black/[0.02] dark:bg-white/[0.04] border-border" : "opacity-40 border-border"
                               }`}
                             >
                               <div className="flex items-center gap-2">
@@ -983,7 +941,7 @@ export default function CreateClassWizard() {
                   borderColor: "var(--card-border)",
                 }}
               >
-                <div className="flex items-center justify-between border-b border-white/10 pb-3 mb-3">
+                <div className="flex items-center justify-between border-b border-border pb-3 mb-3">
                   <span className="text-xs font-bold text-muted-foreground">תצוגה מקדימה של הכיתה</span>
                   <span
                     className="text-xs px-2.5 py-0.5 rounded-full font-bold"
@@ -994,7 +952,7 @@ export default function CreateClassWizard() {
                 </div>
 
                 {coverUrl && (
-                  <div className="w-full h-24 rounded-xl overflow-hidden mb-3 border border-white/10">
+                  <div className="w-full h-24 rounded-xl overflow-hidden mb-3 border border-border">
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img src={coverUrl} alt="תמונת נושא" className="w-full h-full object-cover" />
                   </div>
@@ -1029,7 +987,7 @@ export default function CreateClassWizard() {
                 <button
                   type="button"
                   onClick={() => setStep(2)}
-                  className="py-3 px-5 rounded-xl border border-white/10 text-muted-foreground hover:text-foreground text-sm font-medium transition-all cursor-pointer flex items-center gap-1.5"
+                  className="py-3 px-5 rounded-xl border border-border text-muted-foreground hover:text-foreground text-sm font-medium transition-all cursor-pointer flex items-center gap-1.5"
                 >
                   <ArrowRight className="w-4 h-4" />
                   <span>חזרה</span>
@@ -1071,21 +1029,21 @@ export default function CreateClassWizard() {
               </div>
 
               {/* Shareable Link Box */}
-              <div className="w-full p-4 rounded-2xl bg-white/5 border border-white/10 flex flex-col gap-2.5">
+              <div className="w-full p-4 rounded-2xl bg-black/5 dark:bg-white/5 border border-border flex flex-col gap-2.5">
                 <span className="text-xs text-muted-foreground text-right font-medium">כתובת האתר לשיתוף עם ההורים:</span>
-                <div className="flex items-center justify-between gap-2 bg-black/30 rounded-xl px-3.5 py-2.5" dir="ltr">
+                <div className="flex items-center justify-between gap-2 bg-black/10 dark:bg-black/30 rounded-xl px-3.5 py-2.5" dir="ltr">
                   <span className="text-sm font-mono font-medium text-foreground truncate select-all">
                     {publicUrl}
                   </span>
                   <button
                     onClick={copyPublicLink}
-                    className="p-2 rounded-lg bg-white/10 hover:bg-white/20 text-foreground transition-all cursor-pointer flex items-center gap-1.5 text-xs font-semibold"
+                    className="p-2 rounded-lg bg-black/5 hover:bg-black/10 dark:bg-white/10 dark:hover:bg-white/20 border border-border text-foreground transition-all cursor-pointer flex items-center gap-1.5 text-xs font-semibold"
                     title="העתק קישור"
                   >
                     {copied ? (
                       <>
-                        <Check className="w-3.5 h-3.5 text-emerald-400" />
-                        <span className="text-emerald-400">הועתק!</span>
+                        <Check className="w-3.5 h-3.5 text-emerald-500" />
+                        <span className="text-emerald-500 font-bold">הועתק!</span>
                       </>
                     ) : (
                       <>
@@ -1112,7 +1070,7 @@ export default function CreateClassWizard() {
                   href={`https://wa.me/?text=${whatsappMessage}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="w-full py-3 rounded-xl bg-emerald-600/20 hover:bg-emerald-600/30 border border-emerald-500/40 text-emerald-300 font-bold text-sm transition-all flex items-center justify-center gap-2 cursor-pointer"
+                  className="w-full py-3 rounded-xl bg-emerald-500/15 hover:bg-emerald-500/25 border border-emerald-500/40 text-emerald-700 dark:text-emerald-300 font-bold text-sm transition-all flex items-center justify-center gap-2 cursor-pointer"
                 >
                   <Share2 className="w-4 h-4" />
                   <span>שיתוף הודעה והזמנה בוואטסאפ</span>
