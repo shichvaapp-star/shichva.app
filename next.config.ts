@@ -19,6 +19,10 @@ const nextConfig: NextConfig = {
         protocol: "https",
         hostname: "firebasestorage.googleapis.com",
       },
+      {
+        protocol: "https",
+        hostname: "res.cloudinary.com",
+      },
     ],
   },
   async rewrites() {
@@ -29,14 +33,6 @@ const nextConfig: NextConfig = {
       },
       {
         source: "/kita2/admin",
-        destination: "/admin",
-      },
-      {
-        source: "/kita:id",
-        destination: "/",
-      },
-      {
-        source: "/kita:id/admin",
         destination: "/admin",
       },
     ];

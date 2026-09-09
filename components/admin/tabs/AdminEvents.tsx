@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   collection,
   onSnapshot,
@@ -126,7 +126,7 @@ export default function AdminEvents({ classId }: Props) {
   const [formCat, setFormCat] = useState("אירוע");
   const [formSaving, setFormSaving] = useState(false);
 
-  const colRef = collection(db, "classes", classId, "events");
+  const colRef = useMemo(() => collection(db, "classes", classId, "events"), [classId]);
 
   // Fetch and sync events
   useEffect(() => {
@@ -140,7 +140,7 @@ export default function AdminEvents({ classId }: Props) {
       setLoading(false);
     });
     return () => unsub();
-  }, [classId]);
+  }, [colRef]);
 
   // Load saved calendars from Firestore
   useEffect(() => {
@@ -300,7 +300,7 @@ export default function AdminEvents({ classId }: Props) {
       }
       const data = await res.json();
 
-      const mapped: ImportedEvent[] = data.events.map((e: any) => {
+      const mapped: ImportedEvent[] = (data.events as Array<{ title: string; startDate: string; endDate?: string; description?: string }>).map((e) => {
         const startD = new Date(e.startDate);
         const exists = items.some((existing) => {
           const d1 = existing.date.toDate();
@@ -336,8 +336,9 @@ export default function AdminEvents({ classId }: Props) {
       });
 
       setImportEvents(mapped);
-    } catch (err: any) {
-      alert(`שגיאה בטעינת לוח השנה: ${err.message}`);
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : "שגיאה";
+      alert(`שגיאה בטעינת לוח השנה: ${msg}`);
     } finally {
       setImportLoading(false);
     }
@@ -357,17 +358,19 @@ export default function AdminEvents({ classId }: Props) {
       const batch = writeBatch(db);
       selected.forEach((e) => {
         const docRef = doc(collection(db, "classes", classId, "events"));
-        const data: any = {
+        const data: {
+          title: string;
+          date: Timestamp;
+          category: string;
+          time: string;
+          endDate: Timestamp | null;
+        } = {
           title: e.title,
           date: Timestamp.fromDate(new Date(e.startDate)),
           category: e.category,
           time: "",
+          endDate: e.endDate ? Timestamp.fromDate(new Date(e.endDate)) : null,
         };
-        if (e.endDate) {
-          data.endDate = Timestamp.fromDate(new Date(e.endDate));
-        } else {
-          data.endDate = null;
-        }
         batch.set(docRef, data);
       });
       await batch.commit();
@@ -375,8 +378,9 @@ export default function AdminEvents({ classId }: Props) {
       setImportEvents([]);
       setActiveImportCalName("");
       setViewMode("calendar");
-    } catch (err: any) {
-      alert(`שגיאה בשמירת האירועים: ${err.message}`);
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : "שגיאה";
+      alert(`שגיאה בשמירת האירועים: ${msg}`);
     } finally {
       setImportLoading(false);
     }
@@ -791,7 +795,7 @@ export default function AdminEvents({ classId }: Props) {
             <div className="mt-4 p-3.5 bg-yellow-500/10 border border-yellow-500/25 rounded-xl text-xs text-yellow-200 leading-relaxed">
               <strong>💡 היכן מוצאים את הקישור בגוגל קלנדר?</strong>
               <br />
-              הכנס להגדרות לוח השנה שלך בגוגל &gt; גלול מטה לחלק <strong>"שילוב יומן" (Integrate calendar)</strong> &gt; העתק את הכתובת המופיעה תחת <strong>"כתובת סודית בפורמט iCal" (Secret address in iCal format)</strong> או <strong>"כתובת ציבורית בפורמט iCal" (Public address in iCal format)</strong>.
+              הכנס להגדרות לוח השנה שלך בגוגל &gt; גלול מטה לחלק <strong>&quot;שילוב יומן&quot; (Integrate calendar)</strong> &gt; העתק את הכתובת המופיעה תחת <strong>&quot;כתובת סודית בפורמט iCal&quot; (Secret address in iCal format)</strong> או <strong>&quot;כתובת ציבורית בפורמט iCal&quot; (Public address in iCal format)</strong>.
             </div>
           </div>
 

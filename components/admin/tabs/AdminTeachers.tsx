@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   collection,
   onSnapshot,
@@ -52,7 +52,7 @@ export default function AdminTeachers({ classId }: Props) {
   const [editNotes, setEditNotes] = useState("");
   const [editSaving, setEditSaving] = useState(false);
 
-  const colRef = collection(db, "classes", classId, "teachers");
+  const colRef = useMemo(() => collection(db, "classes", classId, "teachers"), [classId]);
 
   useEffect(() => {
     const q = query(colRef, orderBy("order"));
@@ -63,7 +63,7 @@ export default function AdminTeachers({ classId }: Props) {
       setLoading(false);
     });
     return () => unsub();
-  }, [classId]);
+  }, [colRef]);
 
   async function handleAdd(e: React.FormEvent) {
     e.preventDefault();

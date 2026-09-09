@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import AdminGuide from "@/components/admin/AdminGuide";
 import {
   collection,
@@ -73,7 +73,7 @@ export default function AdminSchedule({ classId }: Props) {
 
   const mergedRef = useRef(false);
 
-  const colRef = collection(db, "classes", classId, "schedule");
+  const colRef = useMemo(() => collection(db, "classes", classId, "schedule"), [classId]);
 
   useEffect(() => {
     const q = query(colRef, orderBy("order"));
@@ -81,7 +81,7 @@ export default function AdminSchedule({ classId }: Props) {
       setRows(snap.docs.map((d) => ({ id: d.id, ...d.data() } as ScheduleRow)));
       setLoading(false);
     });
-  }, [classId]);
+  }, [colRef]);
 
   useEffect(() => {
     getDoc(doc(db, "classes", classId, "meta", "subjects")).then((d) => {
@@ -97,11 +97,14 @@ export default function AdminSchedule({ classId }: Props) {
       if (row.type === "הפסקה") return;
       DAYS.forEach((day) => { const v = row[day]?.trim(); if (v) fromSchedule.add(v); });
     });
-    setSubjects((prev) => {
-      const merged = [...new Set([...prev, ...fromSchedule])].filter(Boolean).sort((a, b) => a.localeCompare(b, "he"));
-      if (merged.length === prev.length) return prev;
-      setDoc(doc(db, "classes", classId, "meta", "subjects"), { list: merged });
-      return merged;
+
+    getDoc(doc(db, "classes", classId, "meta", "subjects")).then((d) => {
+      const existing: string[] = d.exists() ? (d.data().list as string[]) ?? [] : [];
+      const merged = [...new Set([...existing, ...fromSchedule])].filter(Boolean).sort((a, b) => a.localeCompare(b, "he"));
+      if (merged.length !== existing.length) {
+        setSubjects(merged);
+        setDoc(doc(db, "classes", classId, "meta", "subjects"), { list: merged });
+      }
     });
   }, [rows, classId]);
 

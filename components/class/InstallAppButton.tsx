@@ -48,25 +48,19 @@ export default function InstallAppButton() {
   const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null);
   const [showModal, setShowModal] = useState(false);
   const [installedSuccessfully, setInstalledSuccessfully] = useState(false);
-  const [iosBrowserTab, setIosBrowserTab] = useState<"safari" | "chrome">("safari");
+  const [iosBrowserTab, setIosBrowserTab] = useState<"safari" | "chrome">(() => {
+    if (typeof window !== "undefined") {
+      const ua = window.navigator.userAgent.toLowerCase();
+      if (ua.includes("crios")) return "chrome";
+    }
+    return "safari";
+  });
 
   // Check if device is iOS (iPhone/iPad)
   const isIOS =
     typeof window !== "undefined" &&
     (/iphone|ipad|ipod/.test(window.navigator.userAgent.toLowerCase()) ||
       (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1));
-
-  // Check if browser is Chrome on iOS (CriOS)
-  useEffect(() => {
-    if (typeof window !== "undefined") {
-      const ua = window.navigator.userAgent.toLowerCase();
-      if (ua.includes("crios")) {
-        setIosBrowserTab("chrome");
-      } else {
-        setIosBrowserTab("safari");
-      }
-    }
-  }, []);
 
   useEffect(() => {
     // Listen for Chrome/Android/Edge beforeinstallprompt event

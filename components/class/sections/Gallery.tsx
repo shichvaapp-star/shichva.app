@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { collection, query, orderBy, getDocs } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import Image from "next/image";
@@ -26,6 +26,14 @@ export default function Gallery({ classId }: { classId: string }) {
       });
   }, [classId]);
 
+  const prev = useCallback(() => {
+    setCurrent((c) => (c - 1 + photos.length) % photos.length);
+  }, [photos.length]);
+
+  const next = useCallback(() => {
+    setCurrent((c) => (c + 1) % photos.length);
+  }, [photos.length]);
+
   // Keyboard navigation
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
@@ -35,10 +43,7 @@ export default function Gallery({ classId }: { classId: string }) {
     };
     window.addEventListener("keydown", handler);
     return () => window.removeEventListener("keydown", handler);
-  }, [current, photos.length]);
-
-  function prev() { setCurrent((c) => (c - 1 + photos.length) % photos.length); }
-  function next() { setCurrent((c) => (c + 1) % photos.length); }
+  }, [next, prev]);
 
   if (loading || photos.length === 0) return null;
 

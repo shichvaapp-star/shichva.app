@@ -2,7 +2,7 @@
 
 import { useEffect, useState, ReactNode } from "react";
 import { onAuthStateChanged, User } from "firebase/auth";
-import { doc, onSnapshot, setDoc, getDoc } from "firebase/firestore";
+import { doc, onSnapshot } from "firebase/firestore";
 import { auth, db } from "@/lib/firebase";
 import { UserProfile } from "@/types/user";
 import AuthModal from "@/components/auth/AuthModal";

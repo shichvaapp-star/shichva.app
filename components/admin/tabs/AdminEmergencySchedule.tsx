@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import AdminGuide from "@/components/admin/AdminGuide";
 import {
   collection,
@@ -66,8 +66,8 @@ export default function AdminEmergencySchedule({ classId }: Props) {
   const [copying, setCopying] = useState(false);
   const mergedRef = useRef(false);
 
-  const colRef = collection(db, "classes", classId, "emergency_schedule");
-  const metaRef = doc(db, "classes", classId, "meta", "emergency");
+  const colRef = useMemo(() => collection(db, "classes", classId, "emergency_schedule"), [classId]);
+  const metaRef = useMemo(() => doc(db, "classes", classId, "meta", "emergency"), [classId]);
 
   // Load schedule rows (real-time)
   useEffect(() => {
@@ -76,7 +76,7 @@ export default function AdminEmergencySchedule({ classId }: Props) {
       setRows(snap.docs.map((d) => ({ id: d.id, ...d.data() } as ScheduleRow)));
       setLoading(false);
     });
-  }, [classId]);
+  }, [colRef]);
 
   // Load visibility flag
   useEffect(() => {
@@ -84,7 +84,7 @@ export default function AdminEmergencySchedule({ classId }: Props) {
       if (d.exists()) setVisible(d.data().visible ?? false);
       setVisLoading(false);
     });
-  }, [classId]);
+  }, [metaRef]);
 
   // Load + merge subjects from regular schedule palette
   useEffect(() => {
@@ -101,11 +101,14 @@ export default function AdminEmergencySchedule({ classId }: Props) {
       if (row.type === "הפסקה") return;
       DAYS.forEach((day) => { const v = row[day]?.trim(); if (v) fromRows.add(v); });
     });
-    setSubjects((prev) => {
-      const merged = [...new Set([...prev, ...fromRows])].filter(Boolean).sort((a, b) => a.localeCompare(b, "he"));
-      return merged.length === prev.length ? prev : merged;
+    getDoc(doc(db, "classes", classId, "meta", "subjects")).then((d) => {
+      const existing: string[] = d.exists() ? (d.data().list as string[]) ?? [] : [];
+      const merged = [...new Set([...existing, ...fromRows])].filter(Boolean).sort((a, b) => a.localeCompare(b, "he"));
+      if (merged.length !== existing.length) {
+        setSubjects(merged);
+      }
     });
-  }, [rows]);
+  }, [rows, classId]);
 
   // ── Visibility toggle ──
   async function toggleVisible() {

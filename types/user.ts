@@ -7,6 +7,8 @@ export interface UserProfile {
   fullName: string;
   role: UserRole;
   studentName?: string;
+  schoolName?: string;
+  adminClasses?: string[];
   status: UserStatus;
   createdAt: string; // ISO date string
   approvedAt?: string;

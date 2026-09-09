@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
   collection,
   query,
@@ -10,15 +10,17 @@ import {
   deleteDoc,
   doc,
 } from "firebase/firestore";
-import { ref, uploadBytesResumable, getDownloadURL, deleteObject } from "firebase/storage";
+import { ref, deleteObject } from "firebase/storage";
 import { db, storage } from "@/lib/firebase";
+import { uploadFileToCloudinary, deleteUploadedFile } from "@/lib/uploadClient";
 import Image from "next/image";
 
 interface GalleryPhoto {
   id: string;
   url: string;
   caption: string;
-  storagePath: string;
+  storagePath?: string;
+  publicId?: string;
   createdAt: number;
 }
 
@@ -33,7 +35,7 @@ export default function AdminGallery({ classId }: Props) {
   const [deleting, setDeleting] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const colRef = collection(db, "classes", classId, "gallery");
+  const colRef = useMemo(() => collection(db, "classes", classId, "gallery"), [classId]);
 
   useEffect(() => {
     const q = query(colRef, orderBy("createdAt", "desc"));
@@ -41,7 +43,7 @@ export default function AdminGallery({ classId }: Props) {
       setPhotos(snap.docs.map((d) => ({ id: d.id, ...d.data() } as GalleryPhoto)));
       setLoading(false);
     });
-  }, [classId]);
+  }, [colRef]);
 
   async function handleFiles(files: FileList) {
     const allowed = Array.from(files).filter((f) => f.type.startsWith("image/"));
@@ -53,32 +55,26 @@ export default function AdminGallery({ classId }: Props) {
 
     await Promise.all(
       allowed.map(async (file, i) => {
-        const storagePath = `classes/${classId}/gallery/${Date.now()}_${file.name}`;
-        const storageRef = ref(storage, storagePath);
-        const task = uploadBytesResumable(storageRef, file);
+        try {
+          const folder = `shichva/${classId}/gallery`;
+          const res = await uploadFileToCloudinary(file, folder, (pct) => {
+            setUploads((prev) =>
+              prev.map((u, j) => (u.name === file.name && j === i ? { ...u, progress: pct } : u))
+            );
+          });
 
-        await new Promise<void>((resolve, reject) => {
-          task.on(
-            "state_changed",
-            (snap) => {
-              const pct = Math.round((snap.bytesTransferred / snap.totalBytes) * 100);
-              setUploads((prev) =>
-                prev.map((u, j) => (u.name === file.name && j === i ? { ...u, progress: pct } : u))
-              );
-            },
-            reject,
-            async () => {
-              const url = await getDownloadURL(task.snapshot.ref);
-              await addDoc(colRef, {
-                url,
-                storagePath,
-                caption: "",
-                createdAt: Date.now(),
-              });
-              resolve();
-            }
-          );
-        });
+          await addDoc(colRef, {
+            url: res.url,
+            publicId: res.publicId,
+            storagePath: res.publicId,
+            caption: "",
+            createdAt: Date.now(),
+          });
+        } catch (err: unknown) {
+          console.error("Gallery upload error:", err);
+          const msg = err instanceof Error ? err.message : "העלאת התמונה נכשלה";
+          alert(`שגיאה בהעלאת ${file.name}: ${msg}`);
+        }
       })
     );
 
@@ -90,9 +86,19 @@ export default function AdminGallery({ classId }: Props) {
     if (!confirm("למחוק תמונה זו?")) return;
     setDeleting(photo.id);
     try {
-      await deleteObject(ref(storage, photo.storagePath));
+      if (photo.publicId) {
+        await deleteUploadedFile(photo.publicId, "image");
+      } else if (photo.storagePath && photo.storagePath.startsWith("classes/")) {
+        try {
+          await deleteObject(ref(storage, photo.storagePath));
+        } catch {
+          // File may already be deleted from storage
+        }
+      } else if (photo.storagePath) {
+        await deleteUploadedFile(photo.storagePath, "image");
+      }
     } catch {
-      // File may already be deleted from storage — continue to remove Firestore doc
+      // Continue to remove Firestore doc
     }
     await deleteDoc(doc(db, "classes", classId, "gallery", photo.id));
     setDeleting(null);

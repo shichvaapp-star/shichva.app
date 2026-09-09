@@ -13,13 +13,9 @@ import {
   orderBy,
   writeBatch,
 } from "firebase/firestore";
-import {
-  ref,
-  uploadBytesResumable,
-  getDownloadURL,
-  deleteObject,
-} from "firebase/storage";
+import { ref, deleteObject } from "firebase/storage";
 import { db, storage } from "@/lib/firebase";
+import { uploadFileToCloudinary, deleteUploadedFile } from "@/lib/uploadClient";
 import Image from "next/image";
 
 interface Announcement {
@@ -322,71 +318,23 @@ export default function AdminAnnouncements({ classId }: Props) {
     const fileName = file.name;
 
     if (isPdf) {
-      // Handle PDF
       try {
-        const cleanName = file.name.replace(/[^a-zA-Z0-9._-]/g, "_");
-        const storagePath = `classes/${classId}/gallery/announcement_${Date.now()}_${cleanName}`;
-        const storageRef = ref(storage, storagePath);
-        const task = uploadBytesResumable(storageRef, file);
-
-        return await new Promise((resolve, reject) => {
-          task.on(
-            "state_changed",
-            (snap) => {
-              const pct = Math.round((snap.bytesTransferred / snap.totalBytes) * 100);
-              setProgress(pct);
-            },
-            (err) => {
-              console.warn("Storage upload error for PDF, falling back to embedded data URL:", err);
-              reject(err);
-            },
-            async () => {
-              try {
-                const url = await getDownloadURL(task.snapshot.ref);
-                resolve({ url, storagePath, fileName, fileType });
-              } catch (err) {
-                reject(err);
-              }
-            }
-          );
-        });
-      } catch {
-        // Fallback: Embed PDF as Data URL
+        const folder = `shichva/${classId}/announcements`;
+        const res = await uploadFileToCloudinary(file, folder, (pct) => setProgress(pct));
+        return { url: res.url, storagePath: res.publicId, fileName, fileType };
+      } catch (err) {
+        console.warn("Upload error for PDF, falling back to embedded data URL:", err);
         const base64 = await readFileAsBase64(file);
         return { url: base64, fileName, fileType };
       }
     } else {
-      // Handle Image
       const { compressedFile, base64 } = await compressImageToFileOrBase64(file);
       try {
-        const cleanName = compressedFile.name.replace(/[^a-zA-Z0-9._-]/g, "_");
-        const storagePath = `classes/${classId}/gallery/announcement_${Date.now()}_${cleanName}`;
-        const storageRef = ref(storage, storagePath);
-        const task = uploadBytesResumable(storageRef, compressedFile);
-
-        return await new Promise((resolve, reject) => {
-          task.on(
-            "state_changed",
-            (snap) => {
-              const pct = Math.round((snap.bytesTransferred / snap.totalBytes) * 100);
-              setProgress(pct);
-            },
-            (err) => {
-              console.warn("Storage upload error for image, falling back to embedded data URL:", err);
-              reject(err);
-            },
-            async () => {
-              try {
-                const url = await getDownloadURL(task.snapshot.ref);
-                resolve({ url, storagePath, fileName, fileType });
-              } catch (err) {
-                reject(err);
-              }
-            }
-          );
-        });
-      } catch {
-        // Fallback: Embed compressed image
+        const folder = `shichva/${classId}/announcements`;
+        const res = await uploadFileToCloudinary(compressedFile, folder, (pct) => setProgress(pct));
+        return { url: res.url, storagePath: res.publicId, fileName, fileType };
+      } catch (err) {
+        console.warn("Upload error for image, falling back to embedded data URL:", err);
         return { url: base64, fileName, fileType };
       }
     }
@@ -497,10 +445,14 @@ export default function AdminAnnouncements({ classId }: Props) {
       if (editFile) {
         const uploaded = await uploadOrEmbedFile(editFile, (pct) => setEditUploadProgress(pct));
         if (item.imageStoragePath) {
-          try {
-            await deleteObject(ref(storage, item.imageStoragePath));
-          } catch {
-            // Ignore if file doesn't exist
+          if (item.imageStoragePath.startsWith("classes/")) {
+            try {
+              await deleteObject(ref(storage, item.imageStoragePath));
+            } catch {
+              // Ignore if file doesn't exist
+            }
+          } else {
+            await deleteUploadedFile(item.imageStoragePath, item.fileType === "pdf" ? "auto" : "image");
           }
         }
         finalImageUrl = uploaded.url;
@@ -509,10 +461,14 @@ export default function AdminAnnouncements({ classId }: Props) {
         finalImageStoragePath = uploaded.storagePath || null;
       } else if (editRemoveImage) {
         if (item.imageStoragePath) {
-          try {
-            await deleteObject(ref(storage, item.imageStoragePath));
-          } catch {
-            // Ignore if file doesn't exist
+          if (item.imageStoragePath.startsWith("classes/")) {
+            try {
+              await deleteObject(ref(storage, item.imageStoragePath));
+            } catch {
+              // Ignore if file doesn't exist
+            }
+          } else {
+            await deleteUploadedFile(item.imageStoragePath, item.fileType === "pdf" ? "auto" : "image");
           }
         }
         finalImageUrl = null;
@@ -566,10 +522,14 @@ export default function AdminAnnouncements({ classId }: Props) {
   async function handleDelete(item: Announcement) {
     if (!confirm(`למחוק את "${item.title}"?`)) return;
     if (item.imageStoragePath) {
-      try {
-        await deleteObject(ref(storage, item.imageStoragePath));
-      } catch {
-        // Ignore storage delete errors
+      if (item.imageStoragePath.startsWith("classes/")) {
+        try {
+          await deleteObject(ref(storage, item.imageStoragePath));
+        } catch {
+          // Ignore storage delete errors
+        }
+      } else {
+        await deleteUploadedFile(item.imageStoragePath, item.fileType === "pdf" ? "auto" : "image");
       }
     }
     await deleteDoc(doc(db, "classes", classId, "announcements", item.id));

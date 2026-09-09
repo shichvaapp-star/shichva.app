@@ -52,7 +52,7 @@ export async function POST(request: Request) {
     }
 
     const events: Array<{ title: string; startDate: string; endDate?: string; description?: string }> = [];
-    let currentEvent: any = null;
+    let currentEvent: Record<string, string> | null = null;
 
     for (const line of unfoldedLines) {
       if (line.startsWith('BEGIN:VEVENT')) {
@@ -118,7 +118,8 @@ export async function POST(request: Request) {
     });
 
     return NextResponse.json({ events: filteredEvents });
-  } catch (err: any) {
-    return NextResponse.json({ error: err.message }, { status: 500 });
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : "Internal Server Error";
+    return NextResponse.json({ error: message }, { status: 500 });
   }
 }
