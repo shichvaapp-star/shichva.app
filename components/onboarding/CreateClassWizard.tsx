@@ -225,6 +225,18 @@ export default function CreateClassWizard() {
         notifyOnRegistration: true,
         notificationEmail: activeUser.email || email.trim().toLowerCase(),
         ownerUid: activeUser.uid,
+        bgStyle: "geometric",
+        defaultMode: "dark",
+        fontStyle: "modern",
+        modules: {
+          announcements: true,
+          schedule: true,
+          events: true,
+          seating: true,
+          teachers: true,
+          gallery: true,
+          links: true,
+        },
         createdAt: new Date().toISOString(),
       });
 

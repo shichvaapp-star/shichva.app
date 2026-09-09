@@ -48,6 +48,18 @@
   --radius-4xl: calc(var(--radius) * 2.6);
 }
 
+.font-modern {
+  font-family: var(--font-alef), "Alef", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
+}
+
+.font-rounded {
+  font-family: var(--font-varela), "Varela Round", var(--font-alef), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
+}
+
+.font-classic {
+  font-family: var(--font-assistant), "Assistant", var(--font-alef), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
+}
+
 :root {
   font-family: var(--font-alef), "Alef", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   /* Site design tokens - Light Mode */

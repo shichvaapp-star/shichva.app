@@ -5,10 +5,20 @@ import { doc, getDoc, setDoc } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import AdminGuide from "@/components/admin/AdminGuide";
 import { uploadFileToCloudinary } from "@/lib/uploadClient";
-import { Upload, RotateCcw } from "lucide-react";
+import { Upload, RotateCcw, Image as ImageIcon, LayoutGrid, Check, Sun, Moon } from "lucide-react";
 
 interface Props {
   classId: string;
+}
+
+export interface ClassModules {
+  announcements?: boolean;
+  schedule?: boolean;
+  events?: boolean;
+  seating?: boolean;
+  teachers?: boolean;
+  gallery?: boolean;
+  links?: boolean;
 }
 
 export interface ClassSettings {
@@ -18,6 +28,13 @@ export interface ClassSettings {
   logoUrl?: string;
   notifyOnRegistration?: boolean;
   notificationEmail?: string;
+  motto?: string;
+  bgStyle?: "geometric" | "grid" | "stars" | "minimal";
+  mascot?: string;
+  coverUrl?: string;
+  defaultMode?: "dark" | "light";
+  modules?: ClassModules;
+  fontStyle?: "modern" | "rounded" | "classic";
 }
 
 const THEME_OPTIONS = [
@@ -28,12 +45,56 @@ const THEME_OPTIONS = [
   { id: "kita5", label: "ורוד", color: "#ec4899", bg: "rgba(236, 72, 153, 0.15)", border: "rgba(236, 72, 153, 0.4)" },
 ];
 
+const MASCOT_PRESETS = ["", "🦁", "🚀", "🦉", "🎨", "⭐", "🌱", "🐬", "🐝", "🏆", "💡", "🐾", "🌈", "🔥", "⚽", "📚"];
+
+const BG_OPTIONS = [
+  { id: "geometric", label: "טבעות גאומטריות", desc: "סגנון דינמי עם מעגלים וקווים אלכסוניים", icon: "🪐" },
+  { id: "grid", label: "רשת מודרנית", desc: "רשת הייטק עדינה עם נקודות הצטלבות", icon: "📐" },
+  { id: "stars", label: "כוכבים וניצוצות", desc: "קבוצות כוכבים זוהרות ואפקט שמיים", icon: "✨" },
+  { id: "minimal", label: "נקי ומינימליסטי", desc: "רקע חלק ועדין ללא אלמנטים גרפיים", icon: "◽" },
+] as const;
+
+const FONT_OPTIONS = [
+  { id: "modern", name: "אלף (Alef)", desc: "מודרני, נקי וחד", className: "font-modern" },
+  { id: "rounded", name: "ורלה ראונד (Varela Round)", desc: "עגול, חם ומזמין", className: "font-rounded" },
+  { id: "classic", name: "אסיסטנט (Assistant)", desc: "אלגנטי, מובנה ומסודר", className: "font-classic" },
+] as const;
+
+const MODULE_ITEMS: { key: keyof ClassModules; label: string; icon: string; desc: string }[] = [
+  { key: "announcements", label: "הודעות המחנך", icon: "📢", desc: "פרסום עדכונים שוטפים, הודעות וקבצים חשובים" },
+  { key: "schedule", label: "מערכת שעות שבועית", icon: "📅", desc: "לוח זמנים יומי ושבועי לתלמידי הכיתה" },
+  { key: "events", label: "אירועים ומבחנים", icon: "🗓️", desc: "לוח בחינות, מועדים מיוחדים ואירועי שיא" },
+  { key: "seating", label: "מקומות ישיבה", icon: "🪑", desc: "מפת ישיבה אינטראקטיבית של הכיתה" },
+  { key: "teachers", label: "צוות המורים", icon: "👥", desc: "רשימת המורים המקצועיים ופרטי קשר" },
+  { key: "gallery", label: "גלריית תמונות", icon: "🖼️", desc: "תמונות וחוויות מאירועים ופעילויות כיתתיות" },
+  { key: "links", label: "קישורים חשובים", icon: "🔗", desc: "קישורים לאתרי למידה, משוב, משרד החינוך ועוד" },
+];
+
 export default function AdminSettings({ classId }: Props) {
   const [className, setClassName] = useState("כיתה ח׳2");
   const [schoolName, setSchoolName] = useState("חטיבת הביניים בן גוריון הרצליה");
   const [theme, setTheme] = useState("kita2");
   const [logoUrl, setLogoUrl] = useState("");
   const [uploadingLogo, setUploadingLogo] = useState(false);
+
+  // 7 New Design States
+  const [motto, setMotto] = useState("");
+  const [bgStyle, setBgStyle] = useState<"geometric" | "grid" | "stars" | "minimal">("geometric");
+  const [mascot, setMascot] = useState("");
+  const [coverUrl, setCoverUrl] = useState("");
+  const [uploadingCover, setUploadingCover] = useState(false);
+  const [defaultMode, setDefaultMode] = useState<"dark" | "light">("dark");
+  const [fontStyle, setFontStyle] = useState<"modern" | "rounded" | "classic">("modern");
+  const [modules, setModules] = useState<ClassModules>({
+    announcements: true,
+    schedule: true,
+    events: true,
+    seating: true,
+    teachers: true,
+    gallery: true,
+    links: true,
+  });
+
   const [notifyOnRegistration, setNotifyOnRegistration] = useState(false);
   const [notificationEmail, setNotificationEmail] = useState("");
   const [loading, setLoading] = useState(true);
@@ -46,12 +107,14 @@ export default function AdminSettings({ classId }: Props) {
   } | null>(null);
 
   const logoInputRef = useRef<HTMLInputElement>(null);
+  const coverInputRef = useRef<HTMLInputElement>(null);
 
   const guideItems = [
     "שם הכיתה מוצג בכותרת הראשית של האתר ובפאנל הניהול.",
-    "שם בית הספר מוצג מעל כותרת הכיתה.",
-    "סמל בית הספר מוצג בראש הדף הראשי — ניתן להעלות סמל מותאם אישית.",
-    "ערכת הנושא קובעת את צבעי ההדגשה, הכפתורים והרקעים הגרפיים באתר.",
+    "שם בית הספר וסמל המוסד מופיעים בראש האתר — ניתן להעלות סמל מותאם.",
+    "באפשרותכם להגדיר מוטו כיתתי, סמל/אימוג׳י מלווה ותמונת נושא פנורמית (Cover).",
+    "בחרו את סגנון הרקע, גופן האותיות ומצב התצוגה הראשי (כהה או בהיר).",
+    "ברשימת המודולים ניתן לכבות חלקים שאינם רלוונטיים כדי לשמור על האתר נקי וממוקד.",
     "התראות במייל מאפשרות לקבל עדכון מיידי בכל פעם שתלמיד או הורה נרשמים לאתר.",
   ];
 
@@ -68,6 +131,25 @@ export default function AdminSettings({ classId }: Props) {
           if (data.notifyOnRegistration !== undefined)
             setNotifyOnRegistration(data.notifyOnRegistration);
           if (data.notificationEmail) setNotificationEmail(data.notificationEmail);
+
+          // 7 design features
+          if (data.motto !== undefined) setMotto(data.motto || "");
+          if (data.bgStyle) setBgStyle(data.bgStyle);
+          if (data.mascot !== undefined) setMascot(data.mascot || "");
+          if (data.coverUrl !== undefined) setCoverUrl(data.coverUrl || "");
+          if (data.defaultMode) setDefaultMode(data.defaultMode);
+          if (data.fontStyle) setFontStyle(data.fontStyle);
+          if (data.modules) {
+            setModules({
+              announcements: data.modules.announcements !== false,
+              schedule: data.modules.schedule !== false,
+              events: data.modules.events !== false,
+              seating: data.modules.seating !== false,
+              teachers: data.modules.teachers !== false,
+              gallery: data.modules.gallery !== false,
+              links: data.modules.links !== false,
+            });
+          }
         }
       } catch (err) {
         console.error("Error loading settings:", err);
@@ -97,6 +179,25 @@ export default function AdminSettings({ classId }: Props) {
     }
   }
 
+  async function handleCoverFile(file: File) {
+    if (!file.type.startsWith("image/")) {
+      alert("נא לבחור קובץ תמונה בלבד (PNG, JPG, WEBP)");
+      return;
+    }
+    setUploadingCover(true);
+    try {
+      const res = await uploadFileToCloudinary(file, `shichva/${classId}/branding`);
+      setCoverUrl(res.url);
+    } catch (err: unknown) {
+      console.error("Cover upload error:", err);
+      const msg = err instanceof Error ? err.message : "העלאת תמונת הנושא נכשלה";
+      alert(`שגיאה בהעלאת תמונת הנושא: ${msg}`);
+    } finally {
+      setUploadingCover(false);
+      if (coverInputRef.current) coverInputRef.current.value = "";
+    }
+  }
+
   async function handleSave(e: React.FormEvent) {
     e.preventDefault();
     setSaving(true);
@@ -111,6 +212,13 @@ export default function AdminSettings({ classId }: Props) {
           logoUrl: logoUrl.trim() || null,
           notifyOnRegistration,
           notificationEmail: notificationEmail.trim(),
+          motto: motto.trim() || null,
+          bgStyle,
+          mascot: mascot.trim() || null,
+          coverUrl: coverUrl.trim() || null,
+          defaultMode,
+          fontStyle,
+          modules,
           updatedAt: new Date(),
         },
         { merge: true }
@@ -222,6 +330,78 @@ export default function AdminSettings({ classId }: Props) {
               }}
             />
             <span className="text-xs text-muted-foreground">מופיע מעל שם הכיתה בכותרת העליונה.</span>
+          </div>
+
+          {/* Class Motto */}
+          <div className="flex flex-col gap-2">
+            <label className="text-sm font-medium text-foreground">
+              מוטו או משפט פתיחה כיתתי (אופציונלי)
+            </label>
+            <input
+              type="text"
+              value={motto}
+              onChange={(e) => setMotto(e.target.value)}
+              placeholder="לדוגמה: ״לומדים, גדלים ומצליחים ביחד!״"
+              className="w-full rounded-xl px-4 py-2.5 text-sm text-foreground outline-none transition-all"
+              style={{
+                background: "rgba(255,255,255,0.06)",
+                border: "1px solid rgba(255,255,255,0.12)",
+              }}
+            />
+            <span className="text-xs text-muted-foreground">
+              מוצג מתחת לשם הכיתה בראש הדף הראשי ומעניק אווירה אישית ומעצימה.
+            </span>
+          </div>
+
+          {/* Class Mascot / Emoji */}
+          <div className="flex flex-col gap-2.5 pt-2">
+            <label className="text-sm font-medium text-foreground flex items-center justify-between">
+              <span>סמל / קמע כיתתי (אופציונלי)</span>
+              {mascot && (
+                <span className="text-xs text-muted-foreground">
+                  נבחר: <strong className="text-base mr-1">{mascot}</strong>
+                </span>
+              )}
+            </label>
+            <div className="flex items-center gap-1.5 flex-wrap">
+              <button
+                type="button"
+                onClick={() => setMascot("")}
+                className={`px-3 py-1.5 rounded-xl text-xs font-medium border transition-all cursor-pointer ${
+                  !mascot ? "bg-white/15 border-white/30 text-foreground font-bold" : "border-white/10 text-muted-foreground hover:bg-white/5"
+                }`}
+              >
+                ללא סמל
+              </button>
+              {MASCOT_PRESETS.filter(Boolean).map((emoji) => (
+                <button
+                  type="button"
+                  key={emoji}
+                  onClick={() => setMascot(emoji)}
+                  className={`w-9 h-9 rounded-xl text-lg flex items-center justify-center border transition-all cursor-pointer ${
+                    mascot === emoji
+                      ? "ring-2 ring-violet-500 bg-violet-500/20 border-violet-500 scale-110"
+                      : "border-white/10 hover:bg-white/10 opacity-80 hover:opacity-100"
+                  }`}
+                >
+                  {emoji}
+                </button>
+              ))}
+              <input
+                type="text"
+                value={mascot}
+                onChange={(e) => setMascot(e.target.value.slice(0, 4))}
+                placeholder="הקלד אימוג׳י..."
+                className="w-28 rounded-xl px-3 py-1.5 text-xs text-foreground outline-none text-center"
+                style={{
+                  background: "rgba(255,255,255,0.06)",
+                  border: "1px solid rgba(255,255,255,0.12)",
+                }}
+              />
+            </div>
+            <span className="text-xs text-muted-foreground">
+              מופיע ליד שם הכיתה בכותרת ובסרגל הניווט העליון.
+            </span>
           </div>
 
           {/* School Logo */}
@@ -374,7 +554,7 @@ export default function AdminSettings({ classId }: Props) {
           )}
         </div>
 
-        {/* Theme Card */}
+        {/* Hero Cover Banner Card */}
         <div
           className="rounded-2xl p-6 space-y-5"
           style={{
@@ -383,36 +563,306 @@ export default function AdminSettings({ classId }: Props) {
             backdropFilter: "blur(12px)",
           }}
         >
-          <h2 className="text-lg font-bold text-foreground flex items-center gap-2">
-            <span>🎨</span> צבע וערכת נושא
-          </h2>
-          <p className="text-xs text-muted-foreground">
-            בחר את צבע ההדגשה המוביל לאתר הכיתה שלך:
-          </p>
+          <div>
+            <h2 className="text-lg font-bold text-foreground flex items-center gap-2">
+              <ImageIcon className="w-5 h-5 text-violet-400" />
+              <span>תמונת נושא עליונה (Hero Cover Banner)</span>
+            </h2>
+            <p className="text-xs text-muted-foreground mt-1">
+              הוסיפו תמונת אווירה פנורמית רחבה בראש עמוד הכיתה (למשל תמונת מחזור, כיתה או טיול).
+            </p>
+          </div>
 
-          <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
-            {THEME_OPTIONS.map((opt) => {
-              const isSelected = theme === opt.id;
-              return (
+          {coverUrl ? (
+            <div className="space-y-3">
+              <div className="relative w-full h-44 sm:h-56 rounded-2xl overflow-hidden border border-white/15 shadow-md group">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={coverUrl}
+                  alt="תמונת נושא"
+                  className="w-full h-full object-cover"
+                />
+                <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-3">
+                  <button
+                    type="button"
+                    onClick={() => coverInputRef.current?.click()}
+                    className="px-3.5 py-2 rounded-xl text-xs font-bold bg-white text-black hover:bg-white/90 transition-all cursor-pointer shadow-lg flex items-center gap-1.5"
+                  >
+                    <Upload className="w-3.5 h-3.5" />
+                    <span>החלף תמונה</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setCoverUrl("")}
+                    className="px-3.5 py-2 rounded-xl text-xs font-bold bg-red-600 text-white hover:bg-red-700 transition-all cursor-pointer shadow-lg flex items-center gap-1.5"
+                  >
+                    <RotateCcw className="w-3.5 h-3.5" />
+                    <span>הסר תמונה</span>
+                  </button>
+                </div>
+              </div>
+              <div className="flex items-center justify-between text-xs text-muted-foreground">
+                <span>תמונת הנושא מוצגת בראש העמוד לפני תוכן הכיתה.</span>
                 <button
                   type="button"
-                  key={opt.id}
-                  onClick={() => setTheme(opt.id)}
-                  className={`flex flex-col items-center justify-center p-3 rounded-xl border transition-all cursor-pointer ${
-                    isSelected ? "ring-2 ring-offset-2 ring-offset-background" : "hover:bg-white/5 opacity-80 hover:opacity-100"
-                  }`}
-                  style={{
-                    backgroundColor: isSelected ? opt.bg : "rgba(255,255,255,0.03)",
-                    borderColor: isSelected ? opt.border : "rgba(255,255,255,0.1)",
-                    outlineColor: opt.color,
-                  }}
+                  onClick={() => setCoverUrl("")}
+                  className="text-red-400 hover:text-red-300 underline cursor-pointer"
                 >
-                  <span
-                    className="w-7 h-7 rounded-full mb-2 shadow-sm"
-                    style={{ backgroundColor: opt.color }}
-                  />
-                  <span className="text-sm font-semibold text-foreground">{opt.label}</span>
+                  הסר תמונה
                 </button>
+              </div>
+            </div>
+          ) : (
+            <div
+              onClick={() => coverInputRef.current?.click()}
+              className="border-2 border-dashed border-white/15 rounded-2xl p-8 flex flex-col items-center justify-center text-center hover:border-violet-500/50 hover:bg-white/5 transition-all cursor-pointer group"
+            >
+              <div className="w-12 h-12 rounded-2xl bg-white/5 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
+                <ImageIcon className="w-6 h-6 text-muted-foreground group-hover:text-violet-400 transition-colors" />
+              </div>
+              <span className="text-sm font-semibold text-foreground">
+                לחצו כאן להעלאת תמונת נושא פנורמית
+              </span>
+              <span className="text-xs text-muted-foreground mt-1">
+                מומלץ יחס 16:9 או רחב (JPG, PNG, WEBP עד 10MB)
+              </span>
+            </div>
+          )}
+
+          <input
+            ref={coverInputRef}
+            type="file"
+            accept="image/*"
+            className="hidden"
+            onChange={(e) => {
+              const file = e.target.files?.[0];
+              if (file) handleCoverFile(file);
+            }}
+          />
+
+          {uploadingCover && (
+            <div className="flex items-center gap-2 text-xs text-violet-400 animate-pulse">
+              <div className="w-4 h-4 rounded-full border-2 border-violet-400 border-t-transparent animate-spin" />
+              <span>מעלה תמונת נושא לענן...</span>
+            </div>
+          )}
+        </div>
+
+        {/* Design & Appearance Card */}
+        <div
+          className="rounded-2xl p-6 space-y-6"
+          style={{
+            background: "var(--card-bg)",
+            border: "1px solid var(--card-border)",
+            backdropFilter: "blur(12px)",
+          }}
+        >
+          <h2 className="text-lg font-bold text-foreground flex items-center gap-2">
+            <span>🎨</span> צבע, רקע וטיפוגרפיה (עיצוב האתר)
+          </h2>
+
+          {/* Theme Colors */}
+          <div className="space-y-3">
+            <label className="text-sm font-medium text-foreground block">
+              צבע הדגשה מוביל
+            </label>
+            <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
+              {THEME_OPTIONS.map((opt) => {
+                const isSelected = theme === opt.id;
+                return (
+                  <button
+                    type="button"
+                    key={opt.id}
+                    onClick={() => setTheme(opt.id)}
+                    className={`flex flex-col items-center justify-center p-3 rounded-xl border transition-all cursor-pointer ${
+                      isSelected ? "ring-2 ring-offset-2 ring-offset-background" : "hover:bg-white/5 opacity-80 hover:opacity-100"
+                    }`}
+                    style={{
+                      backgroundColor: isSelected ? opt.bg : "rgba(255,255,255,0.03)",
+                      borderColor: isSelected ? opt.border : "rgba(255,255,255,0.1)",
+                      outlineColor: opt.color,
+                    }}
+                  >
+                    <span
+                      className="w-7 h-7 rounded-full mb-2 shadow-sm"
+                      style={{ backgroundColor: opt.color }}
+                    />
+                    <span className="text-sm font-semibold text-foreground">{opt.label}</span>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Background Art Style */}
+          <div className="space-y-3 pt-4 border-t border-white/10">
+            <div>
+              <label className="text-sm font-medium text-foreground block">
+                סגנון טקסטורת רקע
+              </label>
+              <span className="text-xs text-muted-foreground">
+                אפקט ויזואלי עדין המשתלב בצבעי הכיתה ברקע העמוד.
+              </span>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              {BG_OPTIONS.map((opt) => {
+                const isSelected = bgStyle === opt.id;
+                return (
+                  <button
+                    type="button"
+                    key={opt.id}
+                    onClick={() => setBgStyle(opt.id)}
+                    className={`p-3.5 rounded-xl border text-right transition-all cursor-pointer flex items-start gap-3 ${
+                      isSelected
+                        ? "bg-violet-500/15 border-violet-500/50 ring-1 ring-violet-500"
+                        : "border-white/10 hover:bg-white/5 opacity-80 hover:opacity-100"
+                    }`}
+                  >
+                    <span className="text-2xl p-1.5 rounded-lg bg-white/5 shrink-0">{opt.icon}</span>
+                    <div className="flex flex-col">
+                      <span className="text-sm font-bold text-foreground flex items-center gap-1.5">
+                        {opt.label}
+                        {isSelected && <Check className="w-3.5 h-3.5 text-violet-400" />}
+                      </span>
+                      <span className="text-xs text-muted-foreground mt-0.5">{opt.desc}</span>
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Hebrew Font Personality */}
+          <div className="space-y-3 pt-4 border-t border-white/10">
+            <div>
+              <label className="text-sm font-medium text-foreground block">
+                סגנון גופן (טיפוגרפיה בעברית)
+              </label>
+              <span className="text-xs text-muted-foreground">
+                התאימו את אופי הכיתה עם גופנים מותאמים לעברית.
+              </span>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              {FONT_OPTIONS.map((opt) => {
+                const isSelected = fontStyle === opt.id;
+                return (
+                  <button
+                    type="button"
+                    key={opt.id}
+                    onClick={() => setFontStyle(opt.id)}
+                    className={`p-4 rounded-xl border text-right transition-all cursor-pointer flex flex-col justify-between gap-3 ${
+                      isSelected
+                        ? "bg-violet-500/15 border-violet-500/50 ring-1 ring-violet-500"
+                        : "border-white/10 hover:bg-white/5 opacity-80 hover:opacity-100"
+                    }`}
+                  >
+                    <div className="flex items-center justify-between w-full">
+                      <span className="text-xs font-bold text-foreground flex items-center gap-1.5">
+                        {opt.name}
+                        {isSelected && <Check className="w-3.5 h-3.5 text-violet-400" />}
+                      </span>
+                      <span className="text-[11px] text-muted-foreground">{opt.desc}</span>
+                    </div>
+                    <div className={`text-base font-semibold text-foreground p-2.5 rounded-lg bg-white/5 ${opt.className}`}>
+                      שלום כיתה ח׳2 💫
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Default Color Mode (Dark vs Light) */}
+          <div className="space-y-3 pt-4 border-t border-white/10">
+            <div>
+              <label className="text-sm font-medium text-foreground block">
+                מצב תצוגה ראשי (ברירת מחדל למבקרים חדשים)
+              </label>
+              <span className="text-xs text-muted-foreground">
+                קובע אם האתר ייפתח תחילה במצב כהה או בהיר (התלמידים עדיין יוכלו להחליף עצמאית לפי נוחיותם).
+              </span>
+            </div>
+            <div className="grid grid-cols-2 gap-3 max-w-md">
+              <button
+                type="button"
+                onClick={() => setDefaultMode("dark")}
+                className={`p-3 rounded-xl border flex items-center justify-center gap-2.5 text-sm font-semibold transition-all cursor-pointer ${
+                  defaultMode === "dark"
+                    ? "bg-violet-500/20 border-violet-500 text-foreground ring-1 ring-violet-500"
+                    : "border-white/10 text-muted-foreground hover:bg-white/5"
+                }`}
+              >
+                <Moon className="w-4 h-4 text-violet-400" />
+                <span>🌙 מצב כהה (Dark)</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setDefaultMode("light")}
+                className={`p-3 rounded-xl border flex items-center justify-center gap-2.5 text-sm font-semibold transition-all cursor-pointer ${
+                  defaultMode === "light"
+                    ? "bg-amber-500/20 border-amber-500 text-foreground ring-1 ring-amber-500"
+                    : "border-white/10 text-muted-foreground hover:bg-white/5"
+                }`}
+              >
+                <Sun className="w-4 h-4 text-amber-400" />
+                <span>☀️ מצב בהיר (Light)</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* Active Modules Checklist Card */}
+        <div
+          className="rounded-2xl p-6 space-y-5"
+          style={{
+            background: "var(--card-bg)",
+            border: "1px solid var(--card-border)",
+            backdropFilter: "blur(12px)",
+          }}
+        >
+          <div>
+            <h2 className="text-lg font-bold text-foreground flex items-center gap-2">
+              <LayoutGrid className="w-5 h-5 text-violet-400" />
+              <span>רכיבים ומודולים פעילים באתר</span>
+            </h2>
+            <p className="text-xs text-muted-foreground mt-1">
+              התאימו את תוכן האתר לצרכי הכיתה שלכם. רכיבים שתכבו לא יוצגו בדף הכיתה ויוסרו מסרגל הניווט.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3 pt-2">
+            {MODULE_ITEMS.map((item) => {
+              const isEnabled = modules[item.key] !== false;
+              return (
+                <div
+                  key={item.key}
+                  className={`p-3.5 rounded-xl border flex items-center justify-between gap-3 transition-all ${
+                    isEnabled ? "bg-white/[0.04] border-white/15" : "opacity-50 border-white/5 bg-transparent"
+                  }`}
+                >
+                  <div className="flex items-center gap-3">
+                    <span className="text-2xl">{item.icon}</span>
+                    <div>
+                      <div className="text-sm font-bold text-foreground">{item.label}</div>
+                      <div className="text-xs text-muted-foreground">{item.desc}</div>
+                    </div>
+                  </div>
+                  <label className="relative inline-flex items-center cursor-pointer shrink-0">
+                    <input
+                      type="checkbox"
+                      checked={isEnabled}
+                      onChange={(e) =>
+                        setModules((prev) => ({
+                          ...prev,
+                          [item.key]: e.target.checked,
+                        }))
+                      }
+                      className="sr-only peer"
+                    />
+                    <div className="w-11 h-6 bg-white/10 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-violet-600" />
+                  </label>
+                </div>
               );
             })}
           </div>

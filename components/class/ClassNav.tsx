@@ -5,12 +5,29 @@ import { onAuthStateChanged, signOut, User } from "firebase/auth";
 import { auth } from "@/lib/firebase";
 import InstallAppButton from "./InstallAppButton";
 
+export interface ClassModules {
+  announcements?: boolean;
+  schedule?: boolean;
+  events?: boolean;
+  seating?: boolean;
+  teachers?: boolean;
+  gallery?: boolean;
+  links?: boolean;
+}
+
+interface ClassNavProps {
+  classLabel?: string;
+  mascot?: string;
+  modules?: ClassModules;
+}
+
 const sections = [
   { id: "announcements", label: "הודעות" },
   { id: "schedule", label: "מערכת שעות" },
   { id: "events", label: "אירועים" },
   { id: "seating", label: "מקומות ישיבה" },
   { id: "teachers", label: "מורים" },
+  { id: "gallery", label: "גלריה" },
   { id: "links", label: "קישורים" },
 ];
 
@@ -18,7 +35,7 @@ function scrollTo(id: string) {
   document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
 }
 
-export default function ClassNav({ classLabel }: { classLabel?: string }) {
+export default function ClassNav({ classLabel, mascot, modules }: ClassNavProps) {
   const [isDark, setIsDark] = useState(() => {
     if (typeof window !== "undefined") {
       return document.documentElement.classList.contains("dark");
@@ -95,22 +112,25 @@ export default function ClassNav({ classLabel }: { classLabel?: string }) {
     >
       {classLabel && (
         <>
-          <span className="text-xs font-bold text-foreground px-2 hidden sm:inline-block">
-            {classLabel}
+          <span className="text-xs font-bold text-foreground px-2 hidden sm:inline-flex items-center gap-1.5">
+            {mascot && <span className="text-sm">{mascot}</span>}
+            <span>{classLabel}</span>
           </span>
           <span className="text-foreground/20 text-sm hidden sm:inline-block">|</span>
         </>
       )}
 
-      {sections.map((s) => (
-        <button
-          key={s.id}
-          onClick={() => scrollTo(s.id)}
-          className="text-sm text-muted-foreground hover:text-foreground px-3.5 py-1.5 rounded-full hover:bg-black/5 dark:hover:bg-white/10 transition-all duration-200 cursor-pointer"
-        >
-          {s.label}
-        </button>
-      ))}
+      {sections
+        .filter((s) => (modules ? modules[s.id as keyof ClassModules] !== false : true))
+        .map((s) => (
+          <button
+            key={s.id}
+            onClick={() => scrollTo(s.id)}
+            className="text-sm text-muted-foreground hover:text-foreground px-3.5 py-1.5 rounded-full hover:bg-black/5 dark:hover:bg-white/10 transition-all duration-200 cursor-pointer"
+          >
+            {s.label}
+          </button>
+        ))}
 
       <span className="text-foreground/20 text-sm">|</span>
 

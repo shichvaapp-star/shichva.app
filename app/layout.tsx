@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Alef } from "next/font/google";
+import { Alef, Varela_Round, Assistant } from "next/font/google";
 import "./globals.css";
 
 const alef = Alef({
@@ -7,6 +7,20 @@ const alef = Alef({
   subsets: ["hebrew", "latin"],
   display: "swap",
   variable: "--font-alef",
+});
+
+const varelaRound = Varela_Round({
+  weight: ["400"],
+  subsets: ["hebrew", "latin"],
+  display: "swap",
+  variable: "--font-varela",
+});
+
+const assistant = Assistant({
+  weight: ["400", "600", "700"],
+  subsets: ["hebrew", "latin"],
+  display: "swap",
+  variable: "--font-assistant",
 });
 
 export const metadata: Metadata = {
@@ -29,7 +43,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="he" dir="rtl" className={`${alef.variable} ${alef.className} h-full dark`}>
+    <html lang="he" dir="rtl" className={`${alef.variable} ${varelaRound.variable} ${assistant.variable} ${alef.className} h-full dark`}>
       <head>
         <script
           dangerouslySetInnerHTML={{
