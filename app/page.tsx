@@ -1,6 +1,11 @@
-import ClassHome from "@/components/class/ClassHome";
+import CreateClassWizard from "@/components/onboarding/CreateClassWizard";
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "הקמת אתר כיתה חדש תוך דקה | שכבה",
+  description: "פלטפורמת אתרי כיתה חכמים ומאובטחים — צור אתר כיתה ייחודי למחנכים, הורים ותלמידים",
+};
 
 export default function RootHomePage() {
-  const classId = process.env.NEXT_PUBLIC_CLASS_ID || "kita2";
-  return <ClassHome classId={classId} />;
+  return <CreateClassWizard />;
 }

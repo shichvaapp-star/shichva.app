@@ -25,18 +25,6 @@ const nextConfig: NextConfig = {
       },
     ],
   },
-  async rewrites() {
-    return [
-      {
-        source: "/kita2",
-        destination: "/",
-      },
-      {
-        source: "/kita2/admin",
-        destination: "/admin",
-      },
-    ];
-  },
 };
 
 export default nextConfig;
