@@ -38,11 +38,11 @@ export interface ClassSettings {
 }
 
 const THEME_OPTIONS = [
-  { id: "kita1", label: "כחול", color: "#38bdf8", bg: "rgba(56, 189, 248, 0.15)", border: "rgba(56, 189, 248, 0.4)" },
-  { id: "kita2", label: "סגול", color: "#a855f7", bg: "rgba(168, 85, 247, 0.15)", border: "rgba(168, 85, 247, 0.4)" },
-  { id: "kita3", label: "ירוק", color: "#10b981", bg: "rgba(16, 185, 129, 0.15)", border: "rgba(16, 185, 129, 0.4)" },
-  { id: "kita4", label: "כתום", color: "#f59e0b", bg: "rgba(245, 158, 11, 0.15)", border: "rgba(245, 158, 11, 0.4)" },
-  { id: "kita5", label: "ורוד", color: "#ec4899", bg: "rgba(236, 72, 153, 0.15)", border: "rgba(236, 72, 153, 0.4)" },
+  { id: "kita1", label: "כחול שמיים", color: "#38bdf8", bg: "rgba(56, 189, 248, 0.15)", border: "rgba(56, 189, 248, 0.4)" },
+  { id: "kita2", label: "סגול מלכותי", color: "#a855f7", bg: "rgba(168, 85, 247, 0.15)", border: "rgba(168, 85, 247, 0.4)" },
+  { id: "kita3", label: "ירוק אמרלד", color: "#10b981", bg: "rgba(16, 185, 129, 0.15)", border: "rgba(16, 185, 129, 0.4)" },
+  { id: "kita4", label: "כתום שקיעה", color: "#f59e0b", bg: "rgba(245, 158, 11, 0.15)", border: "rgba(245, 158, 11, 0.4)" },
+  { id: "kita5", label: "ורוד מודרני", color: "#ec4899", bg: "rgba(236, 72, 153, 0.15)", border: "rgba(236, 72, 153, 0.4)" },
 ];
 
 const MASCOT_PRESETS = ["", "🦁", "🚀", "🦉", "🎨", "⭐", "🌱", "🐬", "🐝", "🏆", "💡", "🐾", "🌈", "🔥", "⚽", "📚"];
