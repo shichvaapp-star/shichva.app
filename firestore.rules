@@ -1,0 +1,62 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isUserDoc(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+
+    function getUserData() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data;
+    }
+
+    function isApprovedOrAdmin() {
+      return isAuthenticated() && (
+        !exists(/databases/$(database)/documents/users/$(request.auth.uid)) ||
+        getUserData().status == 'approved' ||
+        getUserData().role == 'admin'
+      );
+    }
+
+    function isAdmin() {
+      return isAuthenticated() && (
+        !exists(/databases/$(database)/documents/users/$(request.auth.uid)) ||
+        getUserData().role == 'admin'
+      );
+    }
+
+    // User management collection
+    match /users/{userId} {
+      // Any authenticated user can read their own profile, or admins can read/list all profiles
+      allow read: if isAuthenticated() && (request.auth.uid == userId || isAdmin());
+      // Users can create/update their own initial profile during registration
+      allow create: if isUserDoc(userId);
+      // Only admins or the user themselves can update their details (admins can approve/reject)
+      allow update: if isUserDoc(userId) || isAdmin();
+      // Only admins can delete user records
+      allow delete: if isAdmin();
+    }
+
+    // Class meta (settings / whitelist)
+    match /classes/{classId}/meta/settings {
+      allow read: if true; // Public for theme & school branding on login screen
+      allow write: if isAdmin();
+    }
+
+    match /classes/{classId}/meta/whitelist {
+      allow read: if isAuthenticated(); // To check whitelist upon sign up
+      allow write: if isAdmin();
+    }
+
+    // Protected class content (announcements, schedule, events, seating, gallery, teachers)
+    match /classes/{classId}/{document=**} {
+      allow read: if isApprovedOrAdmin();
+      allow write: if isAdmin();
+    }
+
+  }
+}
