@@ -1,9 +1,11 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { doc, getDoc, setDoc } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import AdminGuide from "@/components/admin/AdminGuide";
+import { uploadFileToCloudinary } from "@/lib/uploadClient";
+import { Upload, RotateCcw } from "lucide-react";
 
 interface Props {
   classId: string;
@@ -13,6 +15,7 @@ export interface ClassSettings {
   className?: string;
   schoolName?: string;
   theme?: string;
+  logoUrl?: string;
   notifyOnRegistration?: boolean;
   notificationEmail?: string;
 }
@@ -29,6 +32,8 @@ export default function AdminSettings({ classId }: Props) {
   const [className, setClassName] = useState("כיתה ח׳2");
   const [schoolName, setSchoolName] = useState("חטיבת הביניים בן גוריון הרצליה");
   const [theme, setTheme] = useState("kita2");
+  const [logoUrl, setLogoUrl] = useState("");
+  const [uploadingLogo, setUploadingLogo] = useState(false);
   const [notifyOnRegistration, setNotifyOnRegistration] = useState(false);
   const [notificationEmail, setNotificationEmail] = useState("");
   const [loading, setLoading] = useState(true);
@@ -40,9 +45,12 @@ export default function AdminSettings({ classId }: Props) {
     text: string;
   } | null>(null);
 
+  const logoInputRef = useRef<HTMLInputElement>(null);
+
   const guideItems = [
     "שם הכיתה מוצג בכותרת הראשית של האתר ובפאנל הניהול.",
     "שם בית הספר מוצג מעל כותרת הכיתה.",
+    "סמל בית הספר מוצג בראש הדף הראשי — ניתן להעלות סמל מותאם אישית.",
     "ערכת הנושא קובעת את צבעי ההדגשה, הכפתורים והרקעים הגרפיים באתר.",
     "התראות במייל מאפשרות לקבל עדכון מיידי בכל פעם שתלמיד או הורה נרשמים לאתר.",
   ];
@@ -56,6 +64,7 @@ export default function AdminSettings({ classId }: Props) {
           if (data.className) setClassName(data.className);
           if (data.schoolName) setSchoolName(data.schoolName);
           if (data.theme) setTheme(data.theme);
+          if (data.logoUrl !== undefined) setLogoUrl(data.logoUrl || "");
           if (data.notifyOnRegistration !== undefined)
             setNotifyOnRegistration(data.notifyOnRegistration);
           if (data.notificationEmail) setNotificationEmail(data.notificationEmail);
@@ -69,6 +78,25 @@ export default function AdminSettings({ classId }: Props) {
     loadSettings();
   }, [classId]);
 
+  async function handleLogoFile(file: File) {
+    if (!file.type.startsWith("image/")) {
+      alert("נא לבחור קובץ תמונה בלבד (PNG, JPG, SVG, WEBP)");
+      return;
+    }
+    setUploadingLogo(true);
+    try {
+      const res = await uploadFileToCloudinary(file, `shichva/${classId}/branding`);
+      setLogoUrl(res.url);
+    } catch (err: unknown) {
+      console.error("Logo upload error:", err);
+      const msg = err instanceof Error ? err.message : "העלאת הסמל נכשלה";
+      alert(`שגיאה בהעלאת הסמל: ${msg}`);
+    } finally {
+      setUploadingLogo(false);
+      if (logoInputRef.current) logoInputRef.current.value = "";
+    }
+  }
+
   async function handleSave(e: React.FormEvent) {
     e.preventDefault();
     setSaving(true);
@@ -80,6 +108,7 @@ export default function AdminSettings({ classId }: Props) {
           className: className.trim(),
           schoolName: schoolName.trim(),
           theme,
+          logoUrl: logoUrl.trim() || null,
           notifyOnRegistration,
           notificationEmail: notificationEmail.trim(),
           updatedAt: new Date(),
@@ -193,6 +222,76 @@ export default function AdminSettings({ classId }: Props) {
               }}
             />
             <span className="text-xs text-muted-foreground">מופיע מעל שם הכיתה בכותרת העליונה.</span>
+          </div>
+
+          {/* School Logo */}
+          <div className="flex flex-col gap-2 pt-4 border-t border-white/10">
+            <label className="text-sm font-medium text-foreground">סמל בית הספר</label>
+            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+              <div
+                className="w-20 h-20 rounded-2xl flex items-center justify-center p-2 shrink-0 border"
+                style={{
+                  background: "rgba(255,255,255,0.04)",
+                  borderColor: "rgba(255,255,255,0.12)",
+                }}
+              >
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={logoUrl || "/school-logo.png"}
+                  alt="סמל בית הספר"
+                  className="max-w-full max-h-full object-contain"
+                  style={{ filter: logoUrl ? "none" : "var(--logo-filter)" }}
+                />
+              </div>
+
+              <div className="flex flex-col gap-2 flex-1">
+                <div className="flex items-center gap-2 flex-wrap">
+                  <input
+                    ref={logoInputRef}
+                    type="file"
+                    accept="image/*"
+                    className="hidden"
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      if (file) handleLogoFile(file);
+                    }}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => logoInputRef.current?.click()}
+                    disabled={uploadingLogo}
+                    className="px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
+                    style={{ background: "var(--theme-accent, #7c3aed)", color: "white" }}
+                  >
+                    {uploadingLogo ? (
+                      <>
+                        <div className="w-3.5 h-3.5 rounded-full border-2 border-white border-t-transparent animate-spin" />
+                        <span>מעלה סמל...</span>
+                      </>
+                    ) : (
+                      <>
+                        <Upload className="w-3.5 h-3.5" />
+                        <span>{logoUrl ? "החלף סמל" : "העלאת סמל חדש"}</span>
+                      </>
+                    )}
+                  </button>
+
+                  {logoUrl && (
+                    <button
+                      type="button"
+                      onClick={() => setLogoUrl("")}
+                      className="px-3 py-2 rounded-xl text-xs font-medium text-muted-foreground hover:text-foreground border border-white/10 hover:bg-white/5 transition-all cursor-pointer flex items-center gap-1"
+                    >
+                      <RotateCcw className="w-3 h-3" />
+                      <span>שחזר ברירת מחדל</span>
+                    </button>
+                  )}
+                </div>
+                <span className="text-xs text-muted-foreground">
+                  מוצג בראש דף הבית של הכיתה. מומלץ להעלות קובץ PNG שקוף (לפחות 150x150 פיקסלים).
+                </span>
+              </div>
+            </div>
           </div>
         </div>
 

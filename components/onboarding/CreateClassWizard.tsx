@@ -1,13 +1,14 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { onAuthStateChanged, createUserWithEmailAndPassword, updateProfile, User } from "firebase/auth";
 import { doc, setDoc, arrayUnion } from "firebase/firestore";
 import { auth, db } from "@/lib/firebase";
 import Link from "next/link";
 import { generateClassSlug, checkClassSlugAvailable, isValidClassSlug } from "@/lib/slugUtils";
-import { Sparkles, CheckCircle, Copy, Check, ArrowRight, ArrowLeft, ExternalLink, ShieldCheck, Share2 } from "lucide-react";
+import { Sparkles, CheckCircle, Copy, Check, ArrowRight, ArrowLeft, ExternalLink, ShieldCheck, Share2, Upload, RotateCcw } from "lucide-react";
 import ThemeInitializer from "@/components/class/ThemeInitializer";
+import { uploadFileToCloudinary } from "@/lib/uploadClient";
 
 const THEMES = [
   { id: "kita1", label: "כחול שמיים", color: "#38bdf8", bg: "rgba(56, 189, 248, 0.15)", border: "rgba(56, 189, 248, 0.4)" },
@@ -31,10 +32,14 @@ export default function CreateClassWizard() {
   const [className, setClassName] = useState("");
   const [slug, setSlug] = useState("");
   const [slugManual, setSlugManual] = useState(false);
+  const [logoUrl, setLogoUrl] = useState("");
+  const [uploadingLogo, setUploadingLogo] = useState(false);
   const [slugStatus, setSlugStatus] = useState<{ checking: boolean; available: boolean; message?: string }>({
     checking: false,
     available: false,
   });
+
+  const logoInputRef = useRef<HTMLInputElement>(null);
 
   // Step 3: Theme
   const [selectedTheme, setSelectedTheme] = useState("kita2");
@@ -44,6 +49,26 @@ export default function CreateClassWizard() {
   const [errorMessage, setErrorMessage] = useState("");
   const [copied, setCopied] = useState(false);
   const [hostname, setHostname] = useState("shichva.app");
+
+  async function handleLogoFile(file: File) {
+    if (!file.type.startsWith("image/")) {
+      alert("נא לבחור קובץ תמונה בלבד (PNG, JPG, SVG, WEBP)");
+      return;
+    }
+    setUploadingLogo(true);
+    try {
+      const targetFolder = slug.trim() ? `shichva/${slug.trim()}/branding` : "shichva/general/branding";
+      const res = await uploadFileToCloudinary(file, targetFolder);
+      setLogoUrl(res.url);
+    } catch (err: unknown) {
+      console.error("Logo upload error:", err);
+      const msg = err instanceof Error ? err.message : "העלאת הסמל נכשלה";
+      alert(`שגיאה בהעלאת הסמל: ${msg}`);
+    } finally {
+      setUploadingLogo(false);
+      if (logoInputRef.current) logoInputRef.current.value = "";
+    }
+  }
 
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -186,6 +211,7 @@ export default function CreateClassWizard() {
         className: className.trim(),
         schoolName: schoolName.trim(),
         theme: selectedTheme,
+        logoUrl: logoUrl.trim() || null,
         ownerUid: activeUser.uid,
         createdAt: new Date().toISOString(),
       });
@@ -195,6 +221,7 @@ export default function CreateClassWizard() {
         className: className.trim(),
         schoolName: schoolName.trim(),
         theme: selectedTheme,
+        logoUrl: logoUrl.trim() || null,
         notifyOnRegistration: true,
         notificationEmail: activeUser.email || email.trim().toLowerCase(),
         ownerUid: activeUser.uid,
@@ -500,6 +527,75 @@ export default function CreateClassWizard() {
                 </p>
               </div>
 
+              {/* Optional School Logo */}
+              <div className="flex flex-col gap-2 pt-3 border-t border-white/10">
+                <label className="text-xs font-semibold text-foreground">סמל בית הספר (אופציונלי)</label>
+                <div className="flex items-center gap-3">
+                  <div
+                    className="w-14 h-14 rounded-xl flex items-center justify-center p-1.5 shrink-0 border"
+                    style={{
+                      background: "rgba(255,255,255,0.04)",
+                      borderColor: "rgba(255,255,255,0.12)",
+                    }}
+                  >
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src={logoUrl || "/school-logo.png"}
+                      alt="סמל בית הספר"
+                      className="max-w-full max-h-full object-contain"
+                      style={{ filter: logoUrl ? "none" : "var(--logo-filter)" }}
+                    />
+                  </div>
+
+                  <div className="flex flex-col gap-1.5 flex-1">
+                    <input
+                      ref={logoInputRef}
+                      type="file"
+                      accept="image/*"
+                      className="hidden"
+                      onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        if (file) handleLogoFile(file);
+                      }}
+                    />
+                    <div className="flex items-center gap-2">
+                      <button
+                        type="button"
+                        onClick={() => logoInputRef.current?.click()}
+                        disabled={uploadingLogo}
+                        className="px-3.5 py-2 rounded-xl text-xs font-semibold transition-all flex items-center gap-1.5 cursor-pointer bg-white/10 hover:bg-white/15 text-foreground disabled:opacity-50"
+                      >
+                        {uploadingLogo ? (
+                          <>
+                            <div className="w-3 h-3 rounded-full border-2 border-white border-t-transparent animate-spin" />
+                            <span>מעלה סמל...</span>
+                          </>
+                        ) : (
+                          <>
+                            <Upload className="w-3.5 h-3.5" />
+                            <span>{logoUrl ? "החלף סמל" : "העלאת סמל"}</span>
+                          </>
+                        )}
+                      </button>
+
+                      {logoUrl && (
+                        <button
+                          type="button"
+                          onClick={() => setLogoUrl("")}
+                          className="px-2.5 py-2 rounded-xl text-xs text-muted-foreground hover:text-foreground hover:bg-white/5 transition-all cursor-pointer flex items-center gap-1"
+                        >
+                          <RotateCcw className="w-3 h-3" />
+                          <span>ברירת מחדל</span>
+                        </button>
+                      )}
+                    </div>
+                    <span className="text-[11px] text-muted-foreground">
+                      ניתן להעלות קובץ PNG שקוף, או להשאיר כברירת מחדל.
+                    </span>
+                  </div>
+                </div>
+              </div>
+
               <div className="flex items-center gap-3 mt-4">
                 <button
                   type="button"
@@ -578,8 +674,19 @@ export default function CreateClassWizard() {
                     פעיל
                   </span>
                 </div>
-                <p className="text-xs text-muted-foreground">{schoolName || "שם בית הספר"}</p>
-                <h3 className="text-lg font-bold text-foreground mt-0.5">{className || "שם הכיתה"}</h3>
+                <div className="flex items-center gap-3">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={logoUrl || "/school-logo.png"}
+                    alt="סמל בית הספר"
+                    className="w-10 h-10 object-contain"
+                    style={{ filter: logoUrl ? "none" : "var(--logo-filter)" }}
+                  />
+                  <div>
+                    <p className="text-xs text-muted-foreground">{schoolName || "שם בית הספר"}</p>
+                    <h3 className="text-lg font-bold text-foreground mt-0.5">{className || "שם הכיתה"}</h3>
+                  </div>
+                </div>
                 <div className="mt-3 flex items-center gap-2 text-xs text-muted-foreground font-mono" dir="ltr">
                   <span>{hostname}/</span>
                   <span className="text-foreground font-bold">{slug}</span>

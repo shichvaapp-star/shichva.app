@@ -37,6 +37,7 @@ export default function ClassHome({ classId }: Props) {
             className: data.className || "כיתה",
             schoolName: data.schoolName || "",
             theme: data.theme || "kita2",
+            logoUrl: data.logoUrl || "",
           });
         }
       },
@@ -83,11 +84,14 @@ export default function ClassHome({ classId }: Props) {
           <div className="text-center py-16 flex flex-col items-center gap-5">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
-              src="/school-logo.png"
+              src={settings.logoUrl || "/school-logo.png"}
               alt={settings.schoolName || "סמל בית הספר"}
               width={86}
               height={86}
-              style={{ filter: "var(--logo-filter)", objectFit: "contain" }}
+              className="max-h-[86px] object-contain"
+              style={{
+                filter: settings.logoUrl ? "none" : "var(--logo-filter)",
+              }}
             />
             <div className="flex items-center flex-col gap-1">
               {settings.schoolName && (
