@@ -8,6 +8,7 @@ import {
   updateDoc,
   deleteDoc,
   setDoc,
+  arrayUnion,
 } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import { UserProfile, UserRole, UserStatus } from "@/types/user";
@@ -25,14 +26,23 @@ export default function AdminUsers({ classId }: Props) {
   const [newWhitelistInput, setNewWhitelistInput] = useState("");
   const [actionLoading, setActionLoading] = useState<string | null>(null);
 
-  // Subscribe to all users
+  // Subscribe to users belonging to this class
   useEffect(() => {
     const unsubscribeUsers = onSnapshot(
       collection(db, "users"),
       (snapshot) => {
         const list: UserProfile[] = [];
         snapshot.forEach((d) => {
-          list.push({ uid: d.id, ...(d.data() as Omit<UserProfile, "uid">) });
+          const u = { uid: d.id, ...(d.data() as Omit<UserProfile, "uid">) };
+          const belongsToClass =
+            (u.classes && u.classes.includes(classId)) ||
+            u.classId === classId ||
+            (u.adminClasses && u.adminClasses.includes(classId)) ||
+            (classId === "kita2" && (!u.classes || u.classes.length === 0) && !u.classId && (!u.adminClasses || u.adminClasses.length === 0));
+
+          if (belongsToClass) {
+            list.push(u);
+          }
         });
         // Sort: pending first, then newest
         list.sort((a, b) => {
@@ -94,7 +104,10 @@ export default function AdminUsers({ classId }: Props) {
   async function handleRoleChange(uid: string, role: UserRole) {
     setActionLoading(uid);
     try {
-      await updateDoc(doc(db, "users", uid), { role });
+      await updateDoc(doc(db, "users", uid), {
+        role,
+        ...(role === "admin" ? { adminClasses: arrayUnion(classId) } : {}),
+      });
     } catch (err) {
       console.error("Error updating user role:", err);
       alert("שגיאה בעדכון תפקיד המשתמש");
@@ -104,13 +117,26 @@ export default function AdminUsers({ classId }: Props) {
   }
 
   async function handleDeleteUser(uid: string, name: string) {
-    if (!confirm(`האם למחוק את המשתמש "${name}" לצמיתות?`)) return;
+    if (!confirm(`האם להסיר את המשתמש "${name}" מהכיתה?`)) return;
     setActionLoading(uid);
     try {
-      await deleteDoc(doc(db, "users", uid));
+      const targetUser = users.find((u) => u.uid === uid);
+      const otherClasses = (targetUser?.classes || []).filter((c) => c !== classId);
+      const otherAdminClasses = (targetUser?.adminClasses || []).filter((c) => c !== classId);
+
+      if (otherClasses.length > 0 || otherAdminClasses.length > 0) {
+        // User belongs to other classes, only detach from this class
+        await updateDoc(doc(db, "users", uid), {
+          classes: otherClasses,
+          adminClasses: otherAdminClasses,
+        });
+      } else {
+        // User only belongs to this class, delete record
+        await deleteDoc(doc(db, "users", uid));
+      }
     } catch (err) {
       console.error("Error deleting user:", err);
-      alert("שגיאה במחיקת המשתמש");
+      alert("שגיאה בהסרת המשתמש");
     } finally {
       setActionLoading(null);
     }

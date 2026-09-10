@@ -8,6 +8,8 @@ export interface UserProfile {
   role: UserRole;
   studentName?: string;
   schoolName?: string;
+  classId?: string;
+  classes?: string[];
   adminClasses?: string[];
   status: UserStatus;
   createdAt: string; // ISO date string

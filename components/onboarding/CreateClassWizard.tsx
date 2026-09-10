@@ -264,6 +264,8 @@ export default function CreateClassWizard() {
           role: "admin",
           status: "approved",
           schoolName: schoolName.trim(),
+          classId: finalSlug,
+          classes: arrayUnion(finalSlug),
           adminClasses: arrayUnion(finalSlug),
           updatedAt: new Date().toISOString(),
         },

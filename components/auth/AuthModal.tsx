@@ -6,7 +6,7 @@ import {
   createUserWithEmailAndPassword,
   updateProfile,
 } from "firebase/auth";
-import { doc, setDoc, getDoc } from "firebase/firestore";
+import { doc, setDoc, getDoc, updateDoc, arrayUnion } from "firebase/firestore";
 import { auth, db } from "@/lib/firebase";
 import { UserProfile, UserRole } from "@/types/user";
 
@@ -35,7 +35,26 @@ export default function AuthModal({
     setError("");
     setLoading(true);
     try {
-      await signInWithEmailAndPassword(auth, email.trim(), password);
+      const userCred = await signInWithEmailAndPassword(auth, email.trim(), password);
+      // Link user to classId if not already present
+      if (userCred.user && classId) {
+        try {
+          const userDocRef = doc(db, "users", userCred.user.uid);
+          const snap = await getDoc(userDocRef);
+          if (snap.exists()) {
+            const data = snap.data();
+            const existingClasses = data.classes || [];
+            if (!existingClasses.includes(classId)) {
+              await updateDoc(userDocRef, {
+                classes: arrayUnion(classId),
+                ...(data.classId ? {} : { classId }),
+              });
+            }
+          }
+        } catch (linkErr) {
+          console.warn("Class membership link on login skipped:", linkErr);
+        }
+      }
     } catch (err: unknown) {
       console.error("Login error:", err);
       setError("אימייל או סיסמה שגויים. אנא נסו שוב.");
@@ -98,6 +117,8 @@ export default function AuthModal({
         fullName: fullName.trim(),
         role,
         ...(role === "parent" ? { studentName: studentName.trim() } : {}),
+        classId,
+        classes: [classId],
         status: isWhitelisted ? "approved" : "pending",
         createdAt: new Date().toISOString(),
         ...(isWhitelisted

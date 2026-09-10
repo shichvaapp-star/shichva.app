@@ -17,6 +17,7 @@ import AdminUsers from "@/components/admin/tabs/AdminUsers";
 import AdminSettings, { ClassSettings } from "@/components/admin/tabs/AdminSettings";
 import ThemeInitializer from "@/components/class/ThemeInitializer";
 import { collection, query, where, onSnapshot as onSnapshotFirestore } from "firebase/firestore";
+import { UserProfile } from "@/types/user";
 
 const TABS = [
   { id: "announcements", label: "הודעות" },
@@ -69,7 +70,19 @@ export default function AdminDashboard({ classId }: Props) {
     const unsubscribePending = onSnapshotFirestore(
       qPending,
       (snap) => {
-        setPendingCount(snap.size);
+        let count = 0;
+        snap.forEach((d) => {
+          const u = d.data() as UserProfile;
+          const belongsToClass =
+            (u.classes && u.classes.includes(classId)) ||
+            u.classId === classId ||
+            (u.adminClasses && u.adminClasses.includes(classId)) ||
+            (classId === "kita2" && (!u.classes || u.classes.length === 0) && !u.classId && (!u.adminClasses || u.adminClasses.length === 0));
+          if (belongsToClass) {
+            count++;
+          }
+        });
+        setPendingCount(count);
       },
       (err) => console.warn("Pending users snapshot warning:", err)
     );
