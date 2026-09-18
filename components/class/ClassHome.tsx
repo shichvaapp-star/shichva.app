@@ -254,7 +254,7 @@ export default function ClassHome({ classId }: Props) {
           {settings.modules?.links !== false && (
             <section id="links" className="py-16 border-t border-border">
               <h2 className="text-2xl font-bold text-foreground mb-6">קישורים חשובים</h2>
-              <QuickLinks />
+              <QuickLinks classId={classId} />
             </section>
           )}
         </main>

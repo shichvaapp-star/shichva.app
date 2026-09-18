@@ -480,12 +480,12 @@ export default function AdminSettings({ classId }: Props) {
                 onChange={(e) => setNotifyOnRegistration(e.target.checked)}
                 className="sr-only peer"
               />
-              <div className="w-11 h-6 bg-white/10 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-violet-600" />
+              <div className="w-11 h-6 bg-black/10 dark:bg-white/10 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-violet-600" />
             </label>
           </div>
 
           {notifyOnRegistration && (
-            <div className="space-y-4 pt-3 border-t border-white/10 animate-in fade-in duration-200">
+            <div className="space-y-4 pt-3 border-t border-black/10 dark:border-white/10 animate-in fade-in duration-200">
               <div className="flex flex-col gap-2">
                 <label className="text-sm font-medium text-foreground">
                   כתובת מייל לקבלת ההתראות (למשל: מייל המחנך/ת)
@@ -497,11 +497,7 @@ export default function AdminSettings({ classId }: Props) {
                     onChange={(e) => setNotificationEmail(e.target.value)}
                     placeholder="teacher@gmail.com"
                     required={notifyOnRegistration}
-                    className="flex-1 rounded-xl px-4 py-2.5 text-sm text-foreground outline-none transition-all"
-                    style={{
-                      background: "rgba(255,255,255,0.06)",
-                      border: "1px solid rgba(255,255,255,0.12)",
-                    }}
+                    className="flex-1 rounded-xl px-4 py-2.5 text-sm text-foreground bg-black/[0.03] dark:bg-white/[0.06] border border-black/15 dark:border-white/12 focus:border-violet-500 outline-none transition-all"
                     dir="ltr"
                   />
                   <button
