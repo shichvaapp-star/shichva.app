@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { collection, query, orderBy, getDocs } from "firebase/firestore";
+import { collection, query, orderBy, onSnapshot } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 
 interface SeatingRow {
@@ -63,15 +63,18 @@ export default function Seating({ classId }: { classId: string }) {
   const classroomRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    getDocs(query(collection(db, "classes", classId, "seating"), orderBy("order")))
-      .then((snapshot) => {
+    const q = query(collection(db, "classes", classId, "seating"), orderBy("order"));
+    return onSnapshot(
+      q,
+      (snapshot) => {
         setRows(snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() } as SeatingRow)));
         setLoading(false);
-      })
-      .catch(() => {
+      },
+      () => {
         setError(true);
         setLoading(false);
-      });
+      }
+    );
   }, [classId]);
 
   useEffect(() => {

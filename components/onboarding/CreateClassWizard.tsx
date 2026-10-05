@@ -1,12 +1,12 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { onAuthStateChanged, createUserWithEmailAndPassword, updateProfile, User } from "firebase/auth";
+import { onAuthStateChanged, createUserWithEmailAndPassword, updateProfile, signOut, User } from "firebase/auth";
 import { doc, setDoc, arrayUnion } from "firebase/firestore";
 import { auth, db } from "@/lib/firebase";
 import Link from "next/link";
 import { generateClassSlug, checkClassSlugAvailable, isValidClassSlug } from "@/lib/slugUtils";
-import { Sparkles, CheckCircle, Copy, Check, ArrowRight, ArrowLeft, ExternalLink, ShieldCheck, Share2, Upload, RotateCcw, Image as ImageIcon, Sun, Moon, Sliders, ChevronDown, ChevronUp } from "lucide-react";
+import { Sparkles, CheckCircle, Copy, Check, ArrowRight, ArrowLeft, ExternalLink, ShieldCheck, Share2, Upload, RotateCcw, Image as ImageIcon, Sun, Moon, Sliders, ChevronDown, ChevronUp, LogOut } from "lucide-react";
 import ThemeInitializer from "@/components/class/ThemeInitializer";
 import { uploadFileToCloudinary } from "@/lib/uploadClient";
 import type { ClassModules } from "@/components/admin/tabs/AdminSettings";

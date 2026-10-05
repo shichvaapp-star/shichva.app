@@ -15,6 +15,9 @@ import {
   addDoc,
 } from "firebase/firestore";
 import { db } from "@/lib/firebase";
+import AdminSeatingSurveyModal from "@/components/admin/tabs/AdminSeatingSurveyModal";
+import { generateAutoSeating } from "@/lib/seatingAlgorithm";
+import { SeatingRequestItem, SeatingSurveyMeta } from "@/types/seating-request";
 
 type SeatField =
   | "desk1_right" | "desk1_left"
@@ -59,6 +62,11 @@ interface Props {
 
 export default function AdminSeating({ classId }: Props) {
   const [rows, setRows] = useState<SeatingRow[]>([]);
+  const [publishedRows, setPublishedRows] = useState<SeatingRow[]>([]);
+  const [draftLoaded, setDraftLoaded] = useState(false);
+  const [publishedLoaded, setPublishedLoaded] = useState(false);
+  const [publishing, setPublishing] = useState(false);
+  const [lastPublishedAt, setLastPublishedAt] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
   // Roster
@@ -76,15 +84,75 @@ export default function AdminSeating({ classId }: Props) {
   const [addingName, setAddingName] = useState("");
   const addInputRef = useRef<HTMLInputElement>(null);
 
-  // ── Load seating (real-time) ──
+  // ── Seating Survey state ──
+  const [surveyModalOpen, setSurveyModalOpen] = useState(false);
+  const [surveyRequests, setSurveyRequests] = useState<Record<string, SeatingRequestItem>>({});
+
+  // ── Load seating draft (real-time for admin editing) ──
+  useEffect(() => {
+    const q = query(
+      collection(db, "classes", classId, "seating_draft"),
+      orderBy("order")
+    );
+    return onSnapshot(q, (snap) => {
+      setRows(snap.docs.map((d) => ({ id: d.id, ...d.data() } as SeatingRow)));
+      setDraftLoaded(true);
+      setLoading(false);
+    });
+  }, [classId]);
+
+  // ── Load published seating (to check difference from live site) ──
   useEffect(() => {
     const q = query(
       collection(db, "classes", classId, "seating"),
       orderBy("order")
     );
     return onSnapshot(q, (snap) => {
-      setRows(snap.docs.map((d) => ({ id: d.id, ...d.data() } as SeatingRow)));
-      setLoading(false);
+      setPublishedRows(snap.docs.map((d) => ({ id: d.id, ...d.data() } as SeatingRow)));
+      setPublishedLoaded(true);
+    });
+  }, [classId]);
+
+  // ── Load seating meta (last published timestamp) ──
+  useEffect(() => {
+    return onSnapshot(doc(db, "classes", classId, "meta", "seating_meta"), (snap) => {
+      if (snap.exists()) {
+        setLastPublishedAt(snap.data()?.lastPublishedAt || null);
+      }
+    });
+  }, [classId]);
+
+  // ── Copy published seating to draft on initial load if draft is empty ──
+  const draftSeededRef = useRef(false);
+  useEffect(() => {
+    if (draftSeededRef.current || !draftLoaded || !publishedLoaded) return;
+    if (rows.length === 0 && publishedRows.length > 0) {
+      draftSeededRef.current = true;
+      const batch = writeBatch(db);
+      publishedRows.forEach((row) => {
+        batch.set(doc(db, "classes", classId, "seating_draft", row.id), {
+          order: row.order,
+          desk1_right: row.desk1_right || "",
+          desk1_left: row.desk1_left || "",
+          desk2_right: row.desk2_right || "",
+          desk2_left: row.desk2_left || "",
+          desk3_right: row.desk3_right || "",
+          desk3_left: row.desk3_left || "",
+          desk4_right: row.desk4_right || "",
+          desk4_left: row.desk4_left || "",
+        });
+      });
+      batch.commit().catch((err) => console.error("Error copying to draft:", err));
+    }
+  }, [draftLoaded, publishedLoaded, rows.length, publishedRows, classId]);
+
+  // ── Load seating survey meta ──
+  useEffect(() => {
+    return onSnapshot(doc(db, "classes", classId, "meta", "seating_survey"), (snap) => {
+      if (snap.exists()) {
+        const data = snap.data() as SeatingSurveyMeta;
+        setSurveyRequests(data.requests || {});
+      }
     });
   }, [classId]);
 
@@ -99,10 +167,11 @@ export default function AdminSeating({ classId }: Props) {
   // ── Seed roster from current seating on first load if roster is empty ──
   const seededRef = useRef(false);
   useEffect(() => {
-    if (seededRef.current || !rosterLoaded || rows.length === 0 || roster.length > 0) return;
+    const sourceRows = rows.length > 0 ? rows : publishedRows;
+    if (seededRef.current || !rosterLoaded || sourceRows.length === 0 || roster.length > 0) return;
     seededRef.current = true;
     const names = new Set<string>();
-    rows.forEach((row) => {
+    sourceRows.forEach((row) => {
       DESK_PAIRS.forEach(([r, l]) => {
         if (row[r]?.trim()) names.add(row[r].trim());
         if (row[l]?.trim()) names.add(row[l].trim());
@@ -113,7 +182,7 @@ export default function AdminSeating({ classId }: Props) {
       setRoster(list);
       setDoc(doc(db, "classes", classId, "meta", "students"), { list });
     }
-  }, [rows, rosterLoaded, roster.length, classId]);
+  }, [rows, publishedRows, rosterLoaded, roster.length, classId]);
 
   // Auto-focus seat input
   useEffect(() => {
@@ -174,15 +243,15 @@ export default function AdminSeating({ classId }: Props) {
     const targetName = targetRow ? targetRow[targetField] || "" : "";
     const batch = writeBatch(db);
     if (srcRowId === targetRowId) {
-      batch.update(doc(db, "classes", classId, "seating", srcRowId), {
+      batch.update(doc(db, "classes", classId, "seating_draft", srcRowId), {
         [srcField]: targetName,
         [targetField]: srcName,
       });
     } else {
-      batch.update(doc(db, "classes", classId, "seating", srcRowId), {
+      batch.update(doc(db, "classes", classId, "seating_draft", srcRowId), {
         [srcField]: targetName,
       });
-      batch.update(doc(db, "classes", classId, "seating", targetRowId), {
+      batch.update(doc(db, "classes", classId, "seating_draft", targetRowId), {
         [targetField]: srcName,
       });
     }
@@ -194,7 +263,7 @@ export default function AdminSeating({ classId }: Props) {
   // ── Sidebar drag & drop (empty seats only) ──
   async function handleSidebarDrop(targetRowId: string, targetField: SeatField) {
     if (!dragFromSidebar) return;
-    await updateDoc(doc(db, "classes", classId, "seating", targetRowId), {
+    await updateDoc(doc(db, "classes", classId, "seating_draft", targetRowId), {
       [targetField]: dragFromSidebar,
     });
     setDragFromSidebar("");
@@ -215,7 +284,7 @@ export default function AdminSeating({ classId }: Props) {
       setRoster(updatedRoster);
       await saveRoster(updatedRoster);
     }
-    await updateDoc(doc(db, "classes", classId, "seating", adding.rowId), {
+    await updateDoc(doc(db, "classes", classId, "seating_draft", adding.rowId), {
       [adding.field]: name,
     });
     setAdding(null);
@@ -224,7 +293,7 @@ export default function AdminSeating({ classId }: Props) {
 
   async function removeSeat(rowId: string, field: SeatField, name: string) {
     if (!confirm(`להסיר את ${name} מהמושב?`)) return;
-    await updateDoc(doc(db, "classes", classId, "seating", rowId), {
+    await updateDoc(doc(db, "classes", classId, "seating_draft", rowId), {
       [field]: "",
     });
   }
@@ -238,7 +307,7 @@ export default function AdminSeating({ classId }: Props) {
         updateData[r] = "";
         updateData[l] = "";
       });
-      batch.update(doc(db, "classes", classId, "seating", row.id), updateData);
+      batch.update(doc(db, "classes", classId, "seating_draft", row.id), updateData);
     });
     await batch.commit();
   }
@@ -288,18 +357,137 @@ export default function AdminSeating({ classId }: Props) {
       });
 
       if (hasUpdate) {
-        batch.update(doc(db, "classes", classId, "seating", row.id), updateData);
+        batch.update(doc(db, "classes", classId, "seating_draft", row.id), updateData);
       }
     });
 
     await batch.commit();
   }
 
+  const submittedSurveyCount = useMemo(() => {
+    return Object.values(surveyRequests).filter((r) => r.eligible && r.choice1).length;
+  }, [surveyRequests]);
+
+  async function applyAutoSeating(requestsToApply?: Record<string, SeatingRequestItem>) {
+    const reqs = requestsToApply || surveyRequests;
+    const reqCount = Object.values(reqs).filter((r) => r.eligible && r.choice1).length;
+
+    if (reqCount === 0) {
+      alert("טרם התקבלו בקשות מתלמידים זכאים בסקר.");
+      return;
+    }
+
+    const result = generateAutoSeating(rows, roster, reqs);
+
+    const confirmMsg = `האלגוריתם סידר מקומות ישיבה:\n• ${result.mutualPairsCount} זוגות בהתאמה הדדית (בחרו זה את זה)\n• ${result.oneWayCount} תלמידים שובצו לפי בקשה אישית\n• ${result.totalPlaced} סה"כ תלמידים שובצו בכיתה\n\nהאם להחיל את הסידור על הלוח כעת? (השינויים יישמרו כטיוטה בבקאנד ויופיעו באתר רק לאחר לחיצה על "עדכן באתר")`;
+
+    if (!confirm(confirmMsg)) return;
+
+    const batch = writeBatch(db);
+    result.updatedRows.forEach((row) => {
+      batch.update(doc(db, "classes", classId, "seating_draft", row.id), {
+        desk1_right: row.desk1_right,
+        desk1_left: row.desk1_left,
+        desk2_right: row.desk2_right,
+        desk2_left: row.desk2_left,
+        desk3_right: row.desk3_right,
+        desk3_left: row.desk3_left,
+        desk4_right: row.desk4_right,
+        desk4_left: row.desk4_left,
+      });
+    });
+
+    await batch.commit();
+  }
+
+  // ── Unpublished changes detection ──
+  const hasUnpublishedChanges = useMemo(() => {
+    if (!draftLoaded || !publishedLoaded) return false;
+    if (rows.length === 0) return false;
+    if (publishedRows.length === 0) return true;
+    if (rows.length !== publishedRows.length) return true;
+
+    for (let i = 0; i < rows.length; i++) {
+      const r = rows[i];
+      const p = publishedRows.find((x) => x.id === r.id) || publishedRows[i];
+      if (!p) return true;
+      for (const [rf, lf] of DESK_PAIRS) {
+        if ((r[rf] || "") !== (p[rf] || "")) return true;
+        if ((r[lf] || "") !== (p[lf] || "")) return true;
+      }
+    }
+    return false;
+  }, [draftLoaded, publishedLoaded, rows, publishedRows]);
+
+  // ── Publish draft to live website ──
+  async function publishToSite() {
+    if (rows.length === 0) return;
+    setPublishing(true);
+    try {
+      const batch = writeBatch(db);
+      rows.forEach((row) => {
+        batch.set(doc(db, "classes", classId, "seating", row.id), {
+          order: row.order,
+          desk1_right: row.desk1_right || "",
+          desk1_left: row.desk1_left || "",
+          desk2_right: row.desk2_right || "",
+          desk2_left: row.desk2_left || "",
+          desk3_right: row.desk3_right || "",
+          desk3_left: row.desk3_left || "",
+          desk4_right: row.desk4_right || "",
+          desk4_left: row.desk4_left || "",
+        });
+      });
+      batch.set(
+        doc(db, "classes", classId, "meta", "seating_meta"),
+        { lastPublishedAt: new Date().toISOString() },
+        { merge: true }
+      );
+      await batch.commit();
+      alert("✓ מקומות הישיבה עודכנו ופורסמו בהצלחה באתר הכיתה!");
+    } catch (err) {
+      console.error("Error publishing seating to site:", err);
+      alert("שגיאה בעדכון מקומות הישיבה באתר");
+    } finally {
+      setPublishing(false);
+    }
+  }
+
+  // ── Revert draft to published ──
+  async function revertToPublished() {
+    if (publishedRows.length === 0) {
+      alert("אין גרסה מפורסמת לשחזור ממנה");
+      return;
+    }
+    if (!confirm("האם לבטל את כל השינויים שלא פורסמו ולשחזר את סידור המקומות המופיע כרגע באתר?")) return;
+    try {
+      const batch = writeBatch(db);
+      publishedRows.forEach((row) => {
+        batch.set(doc(db, "classes", classId, "seating_draft", row.id), {
+          order: row.order,
+          desk1_right: row.desk1_right || "",
+          desk1_left: row.desk1_left || "",
+          desk2_right: row.desk2_right || "",
+          desk2_left: row.desk2_left || "",
+          desk3_right: row.desk3_right || "",
+          desk3_left: row.desk3_left || "",
+          desk4_right: row.desk4_right || "",
+          desk4_left: row.desk4_left || "",
+        });
+      });
+      await batch.commit();
+    } catch (err) {
+      console.error("Error reverting seating to published:", err);
+      alert("שגיאה בשחזור הנתונים מהאתר");
+    }
+  }
+
   async function initializeSeating() {
-    const colRef = collection(db, "classes", classId, "seating");
+    const draftColRef = collection(db, "classes", classId, "seating_draft");
     const emptyRow = { desk1_right: "", desk1_left: "", desk2_right: "", desk2_left: "", desk3_right: "", desk3_left: "", desk4_right: "", desk4_left: "" };
     for (let i = 1; i <= 5; i++) {
-      await addDoc(colRef, { order: i, ...emptyRow });
+      const docRef = await addDoc(draftColRef, { order: i, ...emptyRow });
+      await setDoc(doc(db, "classes", classId, "seating", docRef.id), { order: i, ...emptyRow });
     }
   }
 
@@ -395,11 +583,83 @@ export default function AdminSeating({ classId }: Props) {
 
       {/* ── Seating grid (left in RTL) ── */}
       <div style={{ flex: 1, minWidth: 0 }}>
-        <p className="text-muted-foreground text-sm text-center mb-4" style={{ fontSize: "0.78rem" }}>
-          גרור תלמיד/ה מהרשימה לכיסא פנוי · גרור בין מושבות להחלפה · לחץ × להסרה
+        <p className="text-muted-foreground text-sm text-center mb-3" style={{ fontSize: "0.78rem" }}>
+          גרור תלמיד/ה מהרשימה לכיסא פנוי · גרור בין מושבות להחלפה · השינויים נשמרים כטיוטה ומתפרסמים באתר רק בלחיצה על &quot;עדכן באתר&quot;
         </p>
 
-        <div className="flex justify-center gap-3 mb-6 flex-wrap">
+        {hasUnpublishedChanges && (
+          <div className="mb-4 p-3.5 rounded-xl bg-amber-500/15 border border-amber-500/30 text-amber-800 dark:text-amber-200 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs animate-fade-in shadow-sm">
+            <div className="flex items-center gap-2">
+              <span className="text-base">⚠️</span>
+              <span>
+                <strong>ישנם שינויים שממתינים לעדכון באתר:</strong> השינויים שביצעת מוצגים כרגע רק כאן בפאנל. האתר מציג את הגרסה הקודמת עד ללחיצה על &quot;עדכן באתר&quot;.
+              </span>
+            </div>
+            <div className="flex items-center gap-2 self-end sm:self-center">
+              <button
+                onClick={revertToPublished}
+                className="px-3 py-1.5 rounded-lg border border-amber-500/30 hover:bg-amber-500/20 text-foreground transition-all cursor-pointer font-medium"
+              >
+                ↩️ שחזר מהאתר
+              </button>
+              <button
+                onClick={publishToSite}
+                disabled={publishing}
+                className="px-4 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-bold transition-all shadow-sm cursor-pointer disabled:opacity-50 flex items-center gap-1.5"
+              >
+                <span>🚀</span>
+                <span>{publishing ? "מעדכן באתר..." : "עדכן באתר עכשיו"}</span>
+              </button>
+            </div>
+          </div>
+        )}
+
+        <div className="flex justify-center gap-3 mb-4 flex-wrap items-center">
+          {/* Main Publish Button */}
+          <button
+            onClick={publishToSite}
+            disabled={publishing || !hasUnpublishedChanges}
+            className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 shadow-sm ${
+              hasUnpublishedChanges
+                ? "bg-emerald-600 hover:bg-emerald-500 text-white shadow-emerald-600/20 cursor-pointer animate-pulse"
+                : "bg-black/5 dark:bg-white/5 text-muted-foreground border border-black/10 dark:border-white/10 opacity-70 cursor-not-allowed"
+            }`}
+            title={hasUnpublishedChanges ? "פרסם את השינויים הנוכחיים לאתר הכיתה" : "האתר מעודכן"}
+          >
+            <span>{publishing ? "⏳" : hasUnpublishedChanges ? "🚀" : "✓"}</span>
+            <span>
+              {publishing
+                ? "מעדכן..."
+                : hasUnpublishedChanges
+                ? "עדכן באתר"
+                : "מעודכן באתר"}
+            </span>
+          </button>
+
+          <button
+            className="px-3.5 py-2 rounded-xl bg-violet-600 hover:bg-violet-500 text-white font-semibold text-xs shadow-sm transition-all cursor-pointer flex items-center gap-1.5"
+            onClick={() => setSurveyModalOpen(true)}
+          >
+            <span>📋</span>
+            <span>סקר ובקשות תלמידים</span>
+            {submittedSurveyCount > 0 && (
+              <span className="px-1.5 py-0.2 bg-emerald-400 text-black font-bold text-[10px] rounded-full">
+                {submittedSurveyCount}
+              </span>
+            )}
+          </button>
+
+          {submittedSurveyCount > 0 && (
+            <button
+              className="px-3.5 py-2 rounded-xl bg-violet-500/15 hover:bg-violet-500/25 text-violet-700 dark:text-violet-300 border border-violet-500/30 font-semibold text-xs transition-all cursor-pointer flex items-center gap-1.5"
+              onClick={() => applyAutoSeating()}
+              title="סדר את הכיתה אוטומטית לפי הבקשות שהתקבלו"
+            >
+              <span>✨</span>
+              <span>סדר לפי בקשות</span>
+            </button>
+          )}
+
           <button
             className="btn-primary"
             onClick={randomizeSeating}
@@ -415,6 +675,12 @@ export default function AdminSeating({ classId }: Props) {
             🗑️ הסרת כל התלמידים
           </button>
         </div>
+
+        {lastPublishedAt && (
+          <p className="text-[11px] text-muted-foreground text-center mb-4">
+            עודכן לאחרונה באתר: {new Date(lastPublishedAt).toLocaleDateString("he-IL", { dateStyle: "short", timeStyle: "short" })}
+          </p>
+        )}
 
         {rows.map((row, rowIdx) => (
           <div key={row.id} className="admin-seating-row">
@@ -544,6 +810,14 @@ export default function AdminSeating({ classId }: Props) {
         </div>
       </div>
     </div>
+
+    <AdminSeatingSurveyModal
+      classId={classId}
+      roster={roster}
+      isOpen={surveyModalOpen}
+      onClose={() => setSurveyModalOpen(false)}
+      onApplyAutoSeating={(reqs) => applyAutoSeating(reqs)}
+    />
     </>
   );
 }
