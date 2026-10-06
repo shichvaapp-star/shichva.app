@@ -56,6 +56,19 @@ function heSort(a: string, b: string) {
   return a.localeCompare(b, "he");
 }
 
+function formatPublishDate(dateStr: string) {
+  try {
+    const d = new Date(dateStr);
+    if (isNaN(d.getTime())) return dateStr;
+    return d.toLocaleString("he-IL", {
+      dateStyle: "short",
+      timeStyle: "short",
+    });
+  } catch {
+    return dateStr;
+  }
+}
+
 interface Props {
   classId: string;
 }
@@ -678,7 +691,7 @@ export default function AdminSeating({ classId }: Props) {
 
         {lastPublishedAt && (
           <p className="text-[11px] text-muted-foreground text-center mb-4">
-            עודכן לאחרונה באתר: {new Date(lastPublishedAt).toLocaleDateString("he-IL", { dateStyle: "short", timeStyle: "short" })}
+            עודכן לאחרונה באתר: {formatPublishDate(lastPublishedAt)}
           </p>
         )}
 
